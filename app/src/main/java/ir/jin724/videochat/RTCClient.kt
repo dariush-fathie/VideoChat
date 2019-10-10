@@ -168,3 +168,47 @@ class RTCClient(
         peerConnection?.addIceCandidate(iceCandidate)
     }
 }
+
+
+
+
+/**
+
+PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
+            .builder(this)
+            .setEnableVideoHwAcceleration(true)
+            .createInitializationOptions());
+
+
+    PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
+
+    DefaultVideoEncoderFactory defaultVideoEncoderFactory = new DefaultVideoEncoderFactory(rootEglBase.getEglBaseContext(),  true,  true);
+    DefaultVideoDecoderFactory defaultVideoDecoderFactory = new DefaultVideoDecoderFactory(rootEglBase.getEglBaseContext());
+
+    peerConnectionFactory = new PeerConnectionFactory(options, defaultVideoEncoderFactory,defaultVideoDecoderFactory);
+
+    videoCapturerAndroid = createCameraCapturer(new Camera1Enumerator(false));
+
+    audioConstraints = new MediaConstraints();
+    videoConstraints = new MediaConstraints();
+
+    //Create a VideoSource instance
+    videoSource = peerConnectionFactory.createVideoSource(videoCapturerAndroid);
+    localVideoTrack = peerConnectionFactory.createVideoTrack("100", videoSource);
+
+    //create an AudioSource instance
+    audioSource = peerConnectionFactory.createAudioSource(audioConstraints);
+    localAudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource);
+
+    videoCapturerAndroid.startCapture(1024, 720, 30);
+
+    localVideoView.setVisibility(View.VISIBLE);
+    //create a videoRenderer based on SurfaceViewRenderer instance
+    localRenderer = new VideoRenderer(localVideoView);
+
+    localVideoTrack.addRenderer(localRenderer);
+
+    gotUserMedia = true;
+
+**/
+
