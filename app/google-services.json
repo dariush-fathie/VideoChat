@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1084615000311",
+    "firebase_url": "https://videochat-ba111.firebaseio.com",
+    "project_id": "videochat-ba111",
+    "storage_bucket": "videochat-ba111.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084615000311:android:ccadac247cca55f00313f2",
+        "android_client_info": {
+          "package_name": "ir.jin724.videochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084615000311-ucfuqd9bsvi5r251egr75ghu7coqvs8g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiiuMdI5ZQSrMcD3J2CmOFJWTdsOnaKnI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084615000311-ucfuqd9bsvi5r251egr75ghu7coqvs8g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
