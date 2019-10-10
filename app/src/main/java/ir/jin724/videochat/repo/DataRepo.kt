@@ -2,11 +2,13 @@ package ir.jin724.videochat.repo
 
 import android.content.Context
 import android.widget.Toast
+import com.google.gson.Gson
 import ir.jin724.videochat.VideoChatApp
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -16,8 +18,11 @@ class DataRepo(private val context: Context) {
 
     companion object {
 
+        val gson = Gson()
+
         val client = Retrofit.Builder()
             .baseUrl("https://api.jin724.com/beta/")
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
 
     }
@@ -28,11 +33,15 @@ class DataRepo(private val context: Context) {
     }
 
     fun sendData(data: Any?) {
+
+
+        Timber.tag("DataRepo").e("data = $data")
+
         createDataService().sendData(VideoChatApp.token.also {
             if (it == "")
                 throw Exception("empty token")
 
-        }, data.toString()).enqueue(object : Callback<String> {
+        }, gson.toJson(data)).enqueue(object : Callback<String> {
             override fun onFailure(call: Call<String>, t: Throwable) {
                 Timber.e("error repo , ${t.message}")
             }
