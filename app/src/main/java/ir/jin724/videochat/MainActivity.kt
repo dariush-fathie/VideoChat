@@ -103,12 +103,12 @@ class MainActivity : AppCompatActivity() {
         override fun onOfferReceived(description: SessionDescription) {
             rtcClient.onRemoteSessionReceived(description)
             rtcClient.answer(sdpObserver)
-            remote_view_loading.isGone = true
+            //remote_view_loading.isGone = true
         }
 
         override fun onAnswerReceived(description: SessionDescription) {
             rtcClient.onRemoteSessionReceived(description)
-            remote_view_loading.isGone = true
+            //remote_view_loading.isGone = true
         }
 
         override fun onIceCandidateReceived(iceCandidate: IceCandidate) {

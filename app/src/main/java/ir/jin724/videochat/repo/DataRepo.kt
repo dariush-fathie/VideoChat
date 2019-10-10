@@ -33,8 +33,6 @@ class DataRepo(private val context: Context) {
     }
 
     fun sendData(data: Any?) {
-
-
         Timber.tag("DataRepo").e("data = $data")
 
         createDataService().sendData(VideoChatApp.token.also {
