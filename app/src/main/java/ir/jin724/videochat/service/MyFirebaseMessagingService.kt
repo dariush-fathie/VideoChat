@@ -67,6 +67,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
+        Timber.e(newToken)
+
         VideoChatApp.token = newToken
     }
 

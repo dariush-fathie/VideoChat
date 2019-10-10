@@ -17,9 +17,8 @@ class DataRepo(private val context: Context) {
     companion object {
 
         val client = Retrofit.Builder()
-            .baseUrl("")
+            .baseUrl("https://api.jin724.com/beta/")
             .build()
-
 
     }
 
