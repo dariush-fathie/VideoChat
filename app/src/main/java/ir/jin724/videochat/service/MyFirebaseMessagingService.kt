@@ -1,5 +1,6 @@
 package ir.jin724.videochat.service
 
+import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -31,7 +32,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-
+        Timber.tag(tag).e("message received : ${remoteMessage.data}")
         val data = remoteMessage.data["data"]
         Timber.tag(tag).e("message received : $data")
         val jsonObject = gson.fromJson(data, JsonObject::class.java)
@@ -70,6 +71,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         Timber.e(newToken)
 
         VideoChatApp.token = newToken
+        Log.e("token",newToken)
     }
 
 
