@@ -73,7 +73,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         Timber.e(newToken)
         (applicationContext as VideoChatApp).token=newToken
 
-        Log.e("token",newToken)
+        Log.e("newToken",newToken)
     }
 
 
