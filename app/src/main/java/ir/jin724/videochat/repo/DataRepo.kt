@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.widget.Toast
 import com.google.gson.Gson
 import ir.jin724.videochat.VideoChatApp
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -40,20 +41,21 @@ class DataRepo(private val context: Context) {
             if (it == "")
                 throw Exception("empty token")
 
-        }, gson.toJson(data)).enqueue(object : Callback<String> {
-            override fun onFailure(call: Call<String>, t: Throwable) {
+        }, gson.toJson(data)).enqueue(object : Callback<ResponseBody> {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Timber.e("error repo , ${t.message}")
             }
-            override fun onResponse(call: Call<String>, response: Response<String>) {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 Toast.makeText(context, "ارسال شد", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     interface DataService {
+
         @POST("sendData")
         @FormUrlEncoded
-        fun sendData(@Field("token") token: String, @Field("data") data: String): Call<String>
+        fun sendData(@Field("token") token: String, @Field("data") data: String): Call<ResponseBody>
     }
 
 }
