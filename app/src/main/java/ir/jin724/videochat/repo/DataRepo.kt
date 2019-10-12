@@ -34,6 +34,8 @@ class DataRepo(private val context: Context) {
 
         val token= (context.applicationContext as VideoChatApp).token
 
+        Timber.e("token $token")
+
         createDataService().sendData(token.also {
             if (it == "")
                 throw Exception("empty token")
