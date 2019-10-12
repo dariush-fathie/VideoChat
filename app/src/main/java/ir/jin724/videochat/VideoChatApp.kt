@@ -8,7 +8,7 @@ class VideoChatApp : Application() {
 
 
     companion object {
-        var token = "fG3UeYxQvYM:APA91bHEvOXNHqstKT2FO7OFM0fZVZqR5H387QzQf6KZzrM-P9r7Jv8hJKkjm6KSCYzvkF4eQamt8HM6kjxbABrXA1NUKBpeOc_b28cRXbXjRqd_hS3M_D5c5RLEPHOvBb8O1z-kRNM-"
+        var token = "dm4sBIPWElk:APA91bFaYm-Duq3z7dcTalnounO45-Oi0JVV6mW-ljkCl0gKFLtW_c2gaPjatRvoF79LtEJTLrtZzbE3J_eNAHOGvPGfne8epKeHaP0FJ0eZ6q5zES4n7gGUqlwFl4eDBa0aBLXsKtL7"
     }
 
     override fun onCreate() {
