@@ -8,7 +8,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isGone
 import ir.jin724.videochat.repo.DataRepo
 import ir.jin724.videochat.service.MyFirebaseMessagingService
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val CAMERA_PERMISSION_REQUEST_CODE = 1
         private const val CAMERA_PERMISSION = Manifest.permission.CAMERA
+        private const val RECORD_AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
     }
 
     private lateinit var rtcClient: RTCClient
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(CAMERA_PERMISSION),
+                arrayOf(CAMERA_PERMISSION, RECORD_AUDIO_PERMISSION),
                 CAMERA_PERMISSION_REQUEST_CODE
             )
         }
