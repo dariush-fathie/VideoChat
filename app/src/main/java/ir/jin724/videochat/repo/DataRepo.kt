@@ -1,6 +1,7 @@
 package ir.jin724.videochat.repo
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.widget.Toast
 import com.google.gson.Gson
 import ir.jin724.videochat.VideoChatApp
@@ -17,16 +18,12 @@ import timber.log.Timber
 class DataRepo(private val context: Context) {
 
     companion object {
-
         val gson = Gson()
-
         val client = Retrofit.Builder()
             .baseUrl("https://api.jin724.com/beta/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
     }
-
 
     private fun createDataService(): DataService {
         return client.create(DataService::class.java)
@@ -35,7 +32,9 @@ class DataRepo(private val context: Context) {
     fun sendData(data: Any?) {
         Timber.tag("DataRepo").e("data = $data")
 
-        createDataService().sendData(VideoChatApp.token.also {
+        val token= (context.applicationContext as VideoChatApp).token
+
+        createDataService().sendData(token.also {
             if (it == "")
                 throw Exception("empty token")
 
@@ -43,7 +42,6 @@ class DataRepo(private val context: Context) {
             override fun onFailure(call: Call<String>, t: Throwable) {
                 Timber.e("error repo , ${t.message}")
             }
-
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 Toast.makeText(context, "ارسال شد", Toast.LENGTH_SHORT).show()
             }
@@ -51,11 +49,9 @@ class DataRepo(private val context: Context) {
     }
 
     interface DataService {
-
         @POST("sendData")
         @FormUrlEncoded
         fun sendData(@Field("token") token: String, @Field("data") data: String): Call<String>
-
     }
 
 }

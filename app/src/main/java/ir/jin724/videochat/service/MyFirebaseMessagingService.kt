@@ -10,14 +10,17 @@ import ir.jin724.videochat.VideoChatApp
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 import timber.log.Timber
+import android.content.SharedPreferences
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
-
 
     private var token = ""
     private var messageId = -1
     val gson = Gson()
-
 
     companion object {
         var listener: SignallingClientListener? = null
@@ -26,7 +29,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             this.listener = listener
         }
     }
-
 
     private val tag = this::class.java.simpleName
 
@@ -69,8 +71,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         Timber.e(newToken)
+        (applicationContext as VideoChatApp).token=newToken
 
-        VideoChatApp.token = newToken
         Log.e("token",newToken)
     }
 
