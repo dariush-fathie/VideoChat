@@ -2,19 +2,7 @@ package ir.jin724.videochat
 
 import android.app.Application
 import android.content.Context
-import org.webrtc.Camera2Enumerator
-import org.webrtc.DefaultVideoDecoderFactory
-import org.webrtc.DefaultVideoEncoderFactory
-import org.webrtc.EglBase
-import org.webrtc.IceCandidate
-import org.webrtc.MediaConstraints
-import org.webrtc.PeerConnection
-import org.webrtc.PeerConnectionFactory
-import org.webrtc.SdpObserver
-import org.webrtc.SessionDescription
-import org.webrtc.SurfaceTextureHelper
-import org.webrtc.SurfaceViewRenderer
-import org.webrtc.VideoCapturer
+import org.webrtc.*
 
 class RTCClient(
     context: Application,
@@ -39,7 +27,16 @@ class RTCClient(
 
     private val peerConnectionFactory by lazy { buildPeerConnectionFactory() }
     private val videoCapturer by lazy { getVideoCapturer(context) }
-    private val localVideoSource by lazy { peerConnectionFactory.createVideoSource(false) }
+
+    private val localVideoSource by lazy {
+        peerConnectionFactory.createVideoSource(false)
+    }
+
+    private val localAudioSource by lazy {
+        val audioConstraints = MediaConstraints()
+        peerConnectionFactory.createAudioSource(audioConstraints)
+    }
+
     private val peerConnection by lazy { buildPeerConnection(observer) }
 
     private fun initPeerConnectionFactory(context: Application) {
@@ -54,7 +51,13 @@ class RTCClient(
         return PeerConnectionFactory
             .builder()
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(rootEglBase.eglBaseContext))
-            .setVideoEncoderFactory(DefaultVideoEncoderFactory(rootEglBase.eglBaseContext, true, true))
+            .setVideoEncoderFactory(
+                DefaultVideoEncoderFactory(
+                    rootEglBase.eglBaseContext,
+                    true,
+                    true
+                )
+            )
             .setOptions(PeerConnectionFactory.Options().apply {
                 disableEncryption = true
                 disableNetworkMonitor = true
@@ -62,10 +65,11 @@ class RTCClient(
             .createPeerConnectionFactory()
     }
 
-    private fun buildPeerConnection(observer: PeerConnection.Observer) = peerConnectionFactory.createPeerConnection(
-        iceServer,
-        observer
-    )
+    private fun buildPeerConnection(observer: PeerConnection.Observer) =
+        peerConnectionFactory.createPeerConnection(
+            iceServer,
+            observer
+        )
 
     private fun getVideoCapturer(context: Context) =
         Camera2Enumerator(context).run {
@@ -83,19 +87,31 @@ class RTCClient(
     }
 
     fun startLocalVideoCapture(localVideoOutput: SurfaceViewRenderer) {
-        val surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
-        (videoCapturer as VideoCapturer).initialize(surfaceTextureHelper, localVideoOutput.context, localVideoSource.capturerObserver)
+        val surfaceTextureHelper =
+            SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
+        (videoCapturer as VideoCapturer).initialize(
+            surfaceTextureHelper,
+            localVideoOutput.context,
+            localVideoSource.capturerObserver
+        )
         videoCapturer.startCapture(320, 240, 60)
-        val localVideoTrack = peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
+        val localVideoTrack =
+            peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
         localVideoTrack.addSink(localVideoOutput)
         val localStream = peerConnectionFactory.createLocalMediaStream(LOCAL_STREAM_ID)
+
+        //create an AudioSource instance
+        val localAudioTrack = peerConnectionFactory.createAudioTrack("101", localAudioSource)
+
         localStream.addTrack(localVideoTrack)
+        localStream.addTrack(localAudioTrack)
         peerConnection?.addStream(localStream)
     }
 
     private fun PeerConnection.call(sdpObserver: SdpObserver) {
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
+            mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
         }
 
         createOffer(object : SdpObserver by sdpObserver {
@@ -122,6 +138,7 @@ class RTCClient(
     private fun PeerConnection.answer(sdpObserver: SdpObserver) {
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
+            mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
         }
 
         createAnswer(object : SdpObserver by sdpObserver {
@@ -170,45 +187,43 @@ class RTCClient(
 }
 
 
-
-
 /**
 
 PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
-            .builder(this)
-            .setEnableVideoHwAcceleration(true)
-            .createInitializationOptions());
+.builder(this)
+.setEnableVideoHwAcceleration(true)
+.createInitializationOptions());
 
 
-    PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
+PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
 
-    DefaultVideoEncoderFactory defaultVideoEncoderFactory = new DefaultVideoEncoderFactory(rootEglBase.getEglBaseContext(),  true,  true);
-    DefaultVideoDecoderFactory defaultVideoDecoderFactory = new DefaultVideoDecoderFactory(rootEglBase.getEglBaseContext());
+DefaultVideoEncoderFactory defaultVideoEncoderFactory = new DefaultVideoEncoderFactory(rootEglBase.getEglBaseContext(),  true,  true);
+DefaultVideoDecoderFactory defaultVideoDecoderFactory = new DefaultVideoDecoderFactory(rootEglBase.getEglBaseContext());
 
-    peerConnectionFactory = new PeerConnectionFactory(options, defaultVideoEncoderFactory,defaultVideoDecoderFactory);
+peerConnectionFactory = new PeerConnectionFactory(options, defaultVideoEncoderFactory,defaultVideoDecoderFactory);
 
-    videoCapturerAndroid = createCameraCapturer(new Camera1Enumerator(false));
+videoCapturerAndroid = createCameraCapturer(new Camera1Enumerator(false));
 
-    audioConstraints = new MediaConstraints();
-    videoConstraints = new MediaConstraints();
+audioConstraints = new MediaConstraints();
+videoConstraints = new MediaConstraints();
 
-    //Create a VideoSource instance
-    videoSource = peerConnectionFactory.createVideoSource(videoCapturerAndroid);
-    localVideoTrack = peerConnectionFactory.createVideoTrack("100", videoSource);
+//Create a VideoSource instance
+videoSource = peerConnectionFactory.createVideoSource(videoCapturerAndroid);
+localVideoTrack = peerConnectionFactory.createVideoTrack("100", videoSource);
 
-    //create an AudioSource instance
-    audioSource = peerConnectionFactory.createAudioSource(audioConstraints);
-    localAudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource);
+//create an AudioSource instance
+audioSource = peerConnectionFactory.createAudioSource(audioConstraints);
+localAudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource);
 
-    videoCapturerAndroid.startCapture(1024, 720, 30);
+videoCapturerAndroid.startCapture(1024, 720, 30);
 
-    localVideoView.setVisibility(View.VISIBLE);
-    //create a videoRenderer based on SurfaceViewRenderer instance
-    localRenderer = new VideoRenderer(localVideoView);
+localVideoView.setVisibility(View.VISIBLE);
+//create a videoRenderer based on SurfaceViewRenderer instance
+localRenderer = new VideoRenderer(localVideoView);
 
-    localVideoTrack.addRenderer(localRenderer);
+localVideoTrack.addRenderer(localRenderer);
 
-    gotUserMedia = true;
+gotUserMedia = true;
 
-**/
+ **/
 
