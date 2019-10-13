@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import ir.jin724.videochat.repo.DataRepo
 import ir.jin724.videochat.service.MyFirebaseMessagingService
 import kotlinx.android.synthetic.main.activity_main.*
@@ -110,12 +111,16 @@ class MainActivity : AppCompatActivity() {
         override fun onOfferReceived(description: SessionDescription) {
             rtcClient.onRemoteSessionReceived(description)
             rtcClient.answer(sdpObserver)
-            //remote_view_loading.isGone = true
+            runOnUiThread {
+                remote_view_loading.isGone = true
+            }
         }
 
         override fun onAnswerReceived(description: SessionDescription) {
             rtcClient.onRemoteSessionReceived(description)
-            //remote_view_loading.isGone = true
+            runOnUiThread {
+                remote_view_loading.isGone = true
+            }
         }
 
         override fun onIceCandidateReceived(iceCandidate: IceCandidate) {

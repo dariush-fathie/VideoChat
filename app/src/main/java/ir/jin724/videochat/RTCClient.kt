@@ -3,6 +3,8 @@ package ir.jin724.videochat
 import android.app.Application
 import android.content.Context
 import org.webrtc.*
+import org.webrtc.voiceengine.WebRtcAudioManager
+import org.webrtc.voiceengine.WebRtcAudioUtils
 
 class RTCClient(
     context: Application,
@@ -102,6 +104,9 @@ class RTCClient(
 
         //create an AudioSource instance
         val localAudioTrack = peerConnectionFactory.createAudioTrack("101", localAudioSource)
+
+        WebRtcAudioManager.setStereoOutput(true)
+        WebRtcAudioManager.setStereoOutput(true)
 
         localStream.addTrack(localVideoTrack)
         localStream.addTrack(localAudioTrack)
