@@ -51,10 +51,8 @@ class MainActivity : AppCompatActivity() {
 
         checkCameraPermission()
 
-
         val mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-        mAudioManager.mode = AudioManager.STREAM_MUSIC
+        mAudioManager.mode = AudioManager.MODE_IN_COMMUNICATION
         mAudioManager.isSpeakerphoneOn = true
     }
 
@@ -91,6 +89,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+
         rtcClient.initSurfaceView(remote_view)
         rtcClient.initSurfaceView(local_view)
         rtcClient.startLocalVideoCapture(local_view)

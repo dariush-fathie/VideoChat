@@ -104,7 +104,7 @@ class RTCClient(
         val localAudioTrack = peerConnectionFactory.createAudioTrack("101", localAudioSource)
 
         localStream.addTrack(localVideoTrack)
-        //localStream.addTrack(localAudioTrack)
+        localStream.addTrack(localAudioTrack)
         peerConnection?.addStream(localStream)
     }
 
