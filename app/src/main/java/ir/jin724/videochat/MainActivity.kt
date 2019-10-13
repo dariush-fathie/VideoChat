@@ -1,7 +1,9 @@
 package ir.jin724.videochat
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -48,6 +50,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         checkCameraPermission()
+
+
+        val mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        mAudioManager.mode = AudioManager.STREAM_MUSIC
+        mAudioManager.isSpeakerphoneOn = true
     }
 
     private fun checkCameraPermission() {

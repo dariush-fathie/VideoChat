@@ -58,7 +58,7 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.1.0-beta01'
 
-    implementation "org.webrtc:google-webrtc:1.0.27771"
+    implementation "org.webrtc:google-webrtc:1.0.28513"
 
 
     def retrofit = '2.5.0'

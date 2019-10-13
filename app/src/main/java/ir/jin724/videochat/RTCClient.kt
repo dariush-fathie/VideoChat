@@ -54,7 +54,7 @@ class RTCClient(
             .setVideoEncoderFactory(
                 DefaultVideoEncoderFactory(
                     rootEglBase.eglBaseContext,
-                    false,
+                    true,
                     true
                 )
             )

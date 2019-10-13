@@ -18,6 +18,10 @@ class VideoChatApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
+
+
+        Timber.e("Token = $token")
+
     }
 
 
