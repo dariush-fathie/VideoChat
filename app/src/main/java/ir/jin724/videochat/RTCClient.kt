@@ -23,6 +23,14 @@ class RTCClient(
     }
 
     private val iceServer = listOf(
+        PeerConnection.IceServer.builder("stun:130.185.73.88:3478")
+            .setUsername("kaptaRTC")
+            .setPassword("17551755")
+            .createIceServer(),
+        PeerConnection.IceServer.builder("turn:130.185.73.88:3478")
+            .setUsername("kaptaRTC")
+            .setPassword("17551755")
+            .createIceServer(),
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
             .createIceServer()
     )
@@ -96,7 +104,7 @@ class RTCClient(
             localVideoOutput.context,
             localVideoSource.capturerObserver
         )
-        videoCapturer.startCapture(320, 240, 60)
+        videoCapturer.startCapture(1920, 1080 ,60)
         val localVideoTrack =
             peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
         localVideoTrack.addSink(localVideoOutput)
