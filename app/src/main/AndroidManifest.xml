@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
 
-        <service
+       <!-- <service
             android:name=".service.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
@@ -34,7 +34,7 @@
             </intent-filter>
         </service>
 
-
+-->
     </application>
 
 </manifest>

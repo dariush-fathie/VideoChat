@@ -1,4 +1,4 @@
-package ir.jin724.videochat
+package ir.jin724.videochat.webRTC
 
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription

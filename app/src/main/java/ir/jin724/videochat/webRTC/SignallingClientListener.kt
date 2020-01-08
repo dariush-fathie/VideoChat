@@ -1,4 +1,4 @@
-package ir.jin724.videochat
+package ir.jin724.videochat.webRTC
 
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
