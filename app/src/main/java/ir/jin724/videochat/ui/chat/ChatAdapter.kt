@@ -30,7 +30,7 @@ class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.Vi
 
     fun addItem(item: ChatItem) {
         dataSet.add(item)
-        notifyItemChanged(dataSet.size - 1)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

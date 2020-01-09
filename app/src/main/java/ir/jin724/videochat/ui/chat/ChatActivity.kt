@@ -68,6 +68,9 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     private fun sendMessage(message: String) {
         Toast.makeText(this, "sendMessage", Toast.LENGTH_SHORT).show()
         chatAdapter.addItem(ChatItem(-1, message, user.userId, otherUser.userId, false, ""))
+        binding.rvChats.post {
+            binding.rvChats.scrollToPosition(0)
+        }
         // todo send message to server
     }
 
@@ -103,7 +106,11 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     private fun setUpList() {
         with(binding.rvChats) {
             layoutManager =
-                LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, true)
+                LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
+                    .apply {
+                        stackFromEnd = true
+                        isSmoothScrollbarEnabled = true
+                    }
             addItemDecoration(
                 FixedOffsetDividerDecoration2(
                     this@ChatActivity,
