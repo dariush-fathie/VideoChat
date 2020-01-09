@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="32dp"
+            app:civ_border_color="@color/offline"
+            app:civ_border_width="0.5dp"
+            app:civ_circle_color="@color/yellow"
+            tools:src="@drawable/dariush_avatar" />
+
+        <View
+            android:id="@+id/view_status"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_alignStart="@id/iv_avatar"
+            android:layout_alignTop="@id/iv_avatar"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/solid_circle_blue" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/iv_avatar"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_first_name"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Darius"
+                app:fontFamily="@font/roboto_bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_last_name"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fat'hi" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_address"
+                style="@style/TextAppearance.MaterialComponents.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="mochesh, x, y" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

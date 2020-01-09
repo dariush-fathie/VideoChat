@@ -1,4 +1,4 @@
-package ir.jin724.videochat.signup
+package ir.jin724.videochat.ui.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
@@ -16,9 +16,5 @@ class SignUpViewModel : ViewModel() {
             emit(user)
         }
 
-    fun getAllUsers() = liveData {
-        val users = repository.getAllUsers()
-        emit(users)
-    }
 
 }

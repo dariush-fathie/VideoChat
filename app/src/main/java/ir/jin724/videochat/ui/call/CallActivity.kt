@@ -1,21 +1,22 @@
-package ir.jin724.videochat
+package ir.jin724.videochat.ui.call
 
 import android.Manifest
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.kotlinpermissions.KotlinPermissions
+import ir.jin724.videochat.R
 import ir.jin724.videochat.webRTC.WebRTCClient
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_call.*
 import timber.log.Timber
 
 
-class MainActivity : AppCompatActivity() {
+class CallActivity : AppCompatActivity() {
 
     private lateinit var webRtcClient: WebRTCClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_call)
 
         KotlinPermissions.with(this)
             .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)

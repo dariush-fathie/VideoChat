@@ -14,13 +14,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="72dp"
-            android:text="Jin Test Chat Server"
-            app:fontFamily="@font/roboto_bold" />
+            android:text="Jin Test Chat"
+            android:textAllCaps="true"
+            app:fontFamily="@font/walter_turncoat" />
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/et_first_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:fontFamily="@font/walter_turncoat"
             android:hint="first name" />
 
         <androidx.appcompat.widget.AppCompatEditText
@@ -29,6 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="last name"
+            app:fontFamily="@font/walter_turncoat"
             app:layout_constraintTop_toBottomOf="@id/et_first_name" />
 
         <com.google.android.material.button.MaterialButton

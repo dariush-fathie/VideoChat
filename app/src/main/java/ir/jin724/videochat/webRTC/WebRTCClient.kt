@@ -22,7 +22,6 @@ class WebRTCClient(
         private const val OFFER = "offer"
         private const val ANSWER = "answer"
         private const val CANDIDATE = "candidate"
-        private const val I_AM_ONLINE = "iAmOnline"
 
         private const val SDP_MID = "sdpMid"
         private const val SDP_M_LINE_INDEX = "sdpMLineIndex"
@@ -121,7 +120,6 @@ class WebRTCClient(
         }
 
         socket.connect()
-        socket.emit(I_AM_ONLINE)
     }
 
     private val iceServer = listOf(
