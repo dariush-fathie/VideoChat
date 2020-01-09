@@ -5,7 +5,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground">
 
         <com.mikhaellopez.circularimageview.CircularImageView
             android:id="@+id/iv_avatar"
@@ -60,6 +61,20 @@
                 android:layout_marginTop="4dp"
                 android:text="mochesh, x, y" />
         </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_unseen_messages"
+            style="@style/TextAppearance.MaterialComponents.Caption"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="16dp"
+            android:background="@drawable/solid_circle_primary"
+            android:gravity="center"
+            android:textColor="@color/white"
+            app:fontFamily="@font/fira_sans"
+            android:text="12" />
 
     </RelativeLayout>
 </layout>

@@ -43,7 +43,13 @@ class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.Vi
 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
+        if (isFromMine(position)) {
+            holder as MyMessageHolder
+            holder.bind(getItem(position))
+        } else {
+            holder as ReceivedMessageHolder
+            holder.bind(getItem(position))
+        }
     }
 
     override fun getItemCount(): Int {
@@ -51,11 +57,13 @@ class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.Vi
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (getItem(position).from == user.userId) {
+        return if (isFromMine(position)) {
             MY_CHAT_TYPE
         } else {
             RECEIVED_CHAT_TYPE
         }
     }
+
+    private fun isFromMine(position: Int) = getItem(position).from == user.userId
 
 }

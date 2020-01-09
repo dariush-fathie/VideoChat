@@ -24,7 +24,7 @@
     </style>
 
     <style name="SubTitleTextAppearance" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="fontFamily">@font/roboto_bold</item>
+        <item name="fontFamily">@font/fira_sans</item>
         <item name="android:textAllCaps">true</item>
         <item name="subtitleTextColor">@color/white</item>
     </style>

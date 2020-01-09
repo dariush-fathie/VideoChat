@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 
 fun ViewGroup.inflater(): LayoutInflater {
@@ -27,4 +29,22 @@ fun Context.getColour(@ColorRes color: Int): Int {
 
 fun View.getColour(@ColorRes color: Int): Int {
     return ContextCompat.getColor(context, color)
+}
+
+
+fun AppCompatImageView.setImageResIf(condition: Boolean, @DrawableRes ifTrue: Int, @DrawableRes ifFalse: Int) {
+    if (condition) {
+        setImageResource(ifTrue)
+    } else {
+        setImageResource(ifFalse)
+    }
+}
+
+fun Int.toPx(context: Context): Float {
+    return Converter.pxFromDp(context, this + 0f)
+}
+
+
+fun Float.toPx(context: Context): Float {
+    return Converter.pxFromDp(context, this)
 }

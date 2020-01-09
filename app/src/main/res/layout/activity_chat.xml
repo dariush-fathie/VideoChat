@@ -8,18 +8,25 @@
         android:layout_height="match_parent"
         tools:context=".ui.chat.ChatActivity">
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/chat_background" />
+
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             app:layout_constraintTop_toTopOf="parent"
-            app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
+            app:navigationIcon="@drawable/ic_arrow_left_24dp"
             app:subtitle="username"
             app:subtitleTextAppearance="@style/SubTitleTextAppearance"
             app:subtitleTextColor="@color/white"
             app:title="chat history"
-            app:titleTextAppearance="@style/TitleTextAppearance"
+            app:titleTextAppearance="@style/SubTitleTextAppearance"
             app:titleTextColor="@color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -41,31 +48,40 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="@color/white"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_message"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:background="@color/transparent"
+                android:background="@drawable/round_solid_offline"
                 android:fontFamily="@font/walter_turncoat"
                 android:hint="write a message ..."
+                android:imeOptions="actionSend|actionDone"
+                android:inputType="text"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp" />
+                android:paddingEnd="8dp" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:padding="16dp"
-                app:srcCompat="@drawable/ic_send_black_24dp"
+                android:id="@+id/iv_send"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_send_24dp"
                 app:tint="@color/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:padding="16dp"
-                app:srcCompat="@drawable/ic_attach_file_black_24dp"
+                android:id="@+id/iv_attach"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_attach_24dp"
                 app:tint="@color/colorPrimary" />
 
         </LinearLayout>

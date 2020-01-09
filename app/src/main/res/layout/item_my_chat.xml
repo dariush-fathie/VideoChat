@@ -6,7 +6,6 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         app:shapeAppearance="@style/RightAngleShapeAppearance">
 
         <LinearLayout
@@ -37,16 +36,24 @@
                     android:text="15 min" />
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/tv_replay"
+                    android:id="@+id/iv_delivery"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:padding="6dp"
+                    android:layout_toStartOf="@id/iv_replay"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/ic_check_24dp"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_replay"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_gravity="end"
                     android:padding="6dp"
-                    app:srcCompat="@drawable/ic_reply_black_24dp" />
+                    app:srcCompat="@drawable/ic_reply_24dp" />
             </RelativeLayout>
-
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
