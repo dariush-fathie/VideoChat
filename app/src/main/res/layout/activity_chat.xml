@@ -58,13 +58,15 @@
                 android:layout_height="40dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:background="@drawable/round_solid_primary_alpha15"
-                android:fontFamily="@font/walter_turncoat"
+                android:background="@drawable/round_solid_on_surface"
+                android:fontFamily="@font/fira_sans"
                 android:hint="write a message ..."
                 android:imeOptions="actionSend|actionDone"
                 android:inputType="text"
                 android:paddingStart="16dp"
-                android:paddingEnd="8dp" />
+                android:paddingEnd="8dp"
+                android:textColor="@color/text_on_on_surface"
+                android:textColorHint="@color/hint_on_on_surface" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_send"

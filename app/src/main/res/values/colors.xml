@@ -12,6 +12,11 @@
     <color name="yellow">#FFF59D</color>
     <color name="white">#fff</color>
     <color name="transparent">#00FFFFFF</color>
-    <color name="on_surface">#F3E5F5</color>
+
+
+    <color name="on_surface">#ECE8F1</color>
+    <color name="hint_on_on_surface">#B3A1CA</color>
+    <color name="text_on_on_surface">#301353</color>
+
 
 </resources>
