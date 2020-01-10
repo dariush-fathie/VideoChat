@@ -38,7 +38,7 @@
                     android:id="@+id/iv_delivery"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:padding="6dp"
+                    android:padding="8dp"
                     android:layout_toStartOf="@id/iv_replay"
                     android:layout_centerVertical="true"
                     app:srcCompat="@drawable/ic_check_24dp"/>

@@ -8,12 +8,15 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import ir.jin724.videochat.R
 import ir.jin724.videochat.VideoChatApp
 import ir.jin724.videochat.data.chatRepository.ChatItem
 import ir.jin724.videochat.data.userRepository.User
 import ir.jin724.videochat.databinding.ActivityChatBinding
+import ir.jin724.videochat.util.ChatUtil
 import ir.jin724.videochat.util.FixedOffsetDividerDecoration2
 import ir.jin724.videochat.util.GlideApp
 import ir.jin724.videochat.util.KeyboardUtil
@@ -29,11 +32,15 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private lateinit var chatAdapter: ChatAdapter
-    private val user: User by lazy {
+    private val me: User by lazy {
         (application as VideoChatApp).prefsManager.getUser()
     }
 
-    private lateinit var otherUser: User
+    private lateinit var bob: User
+
+    private val viewModel: ChatViewModel by lazy {
+        ViewModelProviders.of(this).get(ChatViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +53,20 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
         uploadChatBackground()
         setUpMessageBox()
         setClickListenersUp()
+        getMessagesHistory()
+        setUpObservers()
+    }
+
+    private fun setUpObservers() {
+        viewModel.sendChatResult.observe(this) {
+            chatAdapter.delivered(it)
+        }
+    }
+
+    private fun getMessagesHistory() {
+        viewModel.getChatHistory(me.userId, bob.userId).observe(this) {
+            chatAdapter.addItems(it)
+        }
     }
 
     private fun setClickListenersUp() {
@@ -67,9 +88,19 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun sendMessage(message: String) {
         Toast.makeText(this, "sendMessage", Toast.LENGTH_SHORT).show()
-        chatAdapter.addItem(ChatItem(-1, message, user.userId, otherUser.userId, false, ""))
+        chatAdapter.addItem(
+            ChatItem(
+                ChatUtil.generateTempChatItemId(me),
+                message,
+                me.userId,
+                bob.userId,
+                -1,
+                false,
+                ""
+            )
+        )
         binding.rvChats.post {
-            binding.rvChats.scrollToPosition(0)
+            binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
         }
         // todo send message to server
     }
@@ -83,8 +114,8 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun updateToolbar() {
         intent?.run {
-            otherUser = getParcelableExtra(PAYLOAD) ?: throw Exception("otherUser must not be null")
-            otherUser
+            bob = getParcelableExtra(PAYLOAD) ?: throw Exception("otherUser must not be null")
+            bob
         }?.let {
             binding.toolbar.subtitle = it.firstName + " " + it.lastName
         }
@@ -122,7 +153,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
                     1
                 )
             )
-            chatAdapter = ChatAdapter(user)
+            chatAdapter = ChatAdapter(me)
             adapter = chatAdapter
         }
     }

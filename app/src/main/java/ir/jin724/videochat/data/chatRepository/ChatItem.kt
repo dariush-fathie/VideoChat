@@ -8,7 +8,7 @@ data class ChatItem(
 
     @Expose
     @SerializedName("chat_item_id")
-    val ChatItemId: Int = -1,
+    var ChatItemId: Int,
 
     @Expose
     @SerializedName("text")
@@ -22,9 +22,17 @@ data class ChatItem(
     @SerializedName("to")
     val to: Int,
 
+
+    /*
+    * REPLY TO CHAT_ITEM
+    * */
+    @Expose
+    @SerializedName("reply_to")
+    val replyTo: Int = -1,
+
     @Expose
     @SerializedName("delivered")
-    val delivered: Boolean = false,
+    var delivered: Boolean = false,
 
     @Expose
     @SerializedName("time")

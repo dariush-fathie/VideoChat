@@ -4,10 +4,14 @@
     <color name="colorPrimaryDark">#4A148C</color>
     <color name="colorAccent">#D81B60</color>
 
+    <color name="colorPrimary_alpha15">#265E35B1</color>
+
+
     <color name="offline">#DAD9D9</color>
     <color name="online">#039BE5</color>
     <color name="yellow">#FFF59D</color>
     <color name="white">#fff</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="on_surface">#F3E5F5</color>
 
 </resources>

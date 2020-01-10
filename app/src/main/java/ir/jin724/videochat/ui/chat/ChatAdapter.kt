@@ -3,11 +3,12 @@ package ir.jin724.videochat.ui.chat
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ir.jin724.videochat.data.chatRepository.ChatItem
+import ir.jin724.videochat.data.chatRepository.ChatResponse
 import ir.jin724.videochat.data.userRepository.User
-import ir.jin724.videochat.databinding.ItemChatReceivedBinding
-import ir.jin724.videochat.databinding.ItemMyChatBinding
+import ir.jin724.videochat.databinding.ItemBobMessageBinding
+import ir.jin724.videochat.databinding.ItemMyMessaageBinding
+import ir.jin724.videochat.ui.chat.holder.BobMessageHolder
 import ir.jin724.videochat.ui.chat.holder.MyMessageHolder
-import ir.jin724.videochat.ui.chat.holder.ReceivedMessageHolder
 import ir.jin724.videochat.util.inflater
 
 class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -35,9 +36,9 @@ class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.Vi
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == MY_CHAT_TYPE) {
-            MyMessageHolder(ItemMyChatBinding.inflate(parent.inflater()))
+            MyMessageHolder(ItemMyMessaageBinding.inflate(parent.inflater()))
         } else {
-            ReceivedMessageHolder(ItemChatReceivedBinding.inflate(parent.inflater()))
+            BobMessageHolder(ItemBobMessageBinding.inflate(parent.inflater()))
         }
     }
 
@@ -47,7 +48,7 @@ class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.Vi
             holder as MyMessageHolder
             holder.bind(getItem(position))
         } else {
-            holder as ReceivedMessageHolder
+            holder as BobMessageHolder
             holder.bind(getItem(position))
         }
     }
@@ -65,5 +66,17 @@ class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.Vi
     }
 
     private fun isFromMine(position: Int) = getItem(position).from == user.userId
+
+    fun delivered(response: ChatResponse) {
+        val result = dataSet.filter {
+            it.ChatItemId == response.tempChatItemId
+        }
+        if (result.isNotEmpty()) {
+            result.first().delivered = response.delivered
+            result.first().ChatItemId = response.chatItemId
+        }
+        // todo notify only changed position
+        notifyDataSetChanged()
+    }
 
 }
