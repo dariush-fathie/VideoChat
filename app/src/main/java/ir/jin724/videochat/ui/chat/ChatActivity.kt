@@ -61,6 +61,10 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
         viewModel.sendChatResult.observe(this) {
             chatAdapter.delivered(it)
         }
+
+        viewModel.liveNewMessage.observe(this) {
+            chatAdapter.addItem(it)
+        }
     }
 
     private fun getMessagesHistory() {
@@ -88,21 +92,24 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun sendMessage(message: String) {
         Toast.makeText(this, "sendMessage", Toast.LENGTH_SHORT).show()
-        chatAdapter.addItem(
-            ChatItem(
-                ChatUtil.generateTempChatItemId(me),
-                message,
-                me.userId,
-                bob.userId,
-                -1,
-                false,
-                ""
-            )
+        val chatItem = ChatItem(
+            ChatUtil.generateTempChatItemId(me),
+            message,
+            me.userId,
+            bob.userId,
+            -1,
+            false,
+            ""
         )
+
+        chatAdapter.addItem(chatItem)
+
         binding.rvChats.post {
             binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
         }
         // todo send message to server
+
+        viewModel.sendMessage(chatItem)
     }
 
     private fun uploadChatBackground() {

@@ -1,9 +1,6 @@
 package ir.jin724.videochat.data.chatRepository
 
-import retrofit2.http.Field
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ChatService {
 
@@ -15,6 +12,7 @@ interface ChatService {
 
 
     @POST("sendMessage")
+    @FormUrlEncoded
     suspend fun sendMessage(
         @Field("chat_item") chatItem: String
     ): ChatResponse

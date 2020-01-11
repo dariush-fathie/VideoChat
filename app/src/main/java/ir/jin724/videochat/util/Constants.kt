@@ -2,6 +2,7 @@ package ir.jin724.videochat.util
 
 object Constants {
 
+    const val NEW_MESSAGE = "new_message"
     const val EVENT_NEW_CONNECTION = "newConnection"
     const val EVENT_DISCONNECTED = "disconnected"
 

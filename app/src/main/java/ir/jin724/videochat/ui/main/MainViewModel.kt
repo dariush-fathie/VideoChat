@@ -15,7 +15,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = UserRepository()
     private val socket = (application as VideoChatApp).socket
-    private val gson = Gson()
+
 
     fun getAllUsers() = liveData {
         val users = repository.getAllUsers()
@@ -41,7 +41,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             socket.on(Constants.EVENT_NEW_CONNECTION) {
                 if (it.isNotEmpty()) {
-                    val newUser = gson.fromJson<User>((it[0] as JSONObject).toString(), User::class.java)
+                    val newUser = VideoChatApp.gson.fromJson<User>((it[0] as JSONObject).toString(), User::class.java)
                     connectionTrigger.postValue(newUser)
                 }
             }
@@ -55,6 +55,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             socket.on(Constants.YOU_ARE_ONLINE) {
                 Timber.e(Constants.YOU_ARE_ONLINE)
+            }
+
+            socket.on(Constants.NEW_MESSAGE) {
+                Timber.e(Constants.NEW_MESSAGE)
             }
 
             socket.connect()

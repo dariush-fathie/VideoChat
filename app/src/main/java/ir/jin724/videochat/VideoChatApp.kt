@@ -3,6 +3,7 @@ package ir.jin724.videochat
 import android.app.Application
 import android.content.Context
 import androidx.multidex.MultiDex
+import com.google.gson.Gson
 import io.socket.client.IO
 import io.socket.client.Socket
 import ir.jin724.videochat.util.Constants
@@ -34,6 +35,8 @@ class VideoChatApp : Application() {
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
+
+        val gson = Gson()
     }
 
     val socket: Socket by lazy { IO.socket(SIGNALING_URI) }
