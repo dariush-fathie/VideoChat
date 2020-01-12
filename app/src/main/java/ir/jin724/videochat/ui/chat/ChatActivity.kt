@@ -1,5 +1,9 @@
 package ir.jin724.videochat.ui.chat
 
+import android.content.Context
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.media.RingtoneManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -60,10 +64,17 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     private fun setUpObservers() {
         viewModel.sendChatResult.observe(this) {
             chatAdapter.delivered(it)
+            binding.rvChats.post {
+                binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
+            }
         }
 
         viewModel.liveNewMessage.observe(this) {
             chatAdapter.addItem(it)
+            playSound()
+            binding.rvChats.post {
+                binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
+            }
         }
     }
 
@@ -79,7 +90,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun setUpMessageBox() {
-        binding.etMessage.setOnEditorActionListener { v, actionId, event ->
+        /*binding.etMessage.setOnEditorActionListener { v, actionId, event ->
             if (actionId in arrayOf(EditorInfo.IME_ACTION_SEND, EditorInfo.IME_ACTION_DONE)) {
                 val message = v.text.toString()
                 if (performMessage(message)) {
@@ -87,7 +98,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             return@setOnEditorActionListener false
-        }
+        }*/
     }
 
     private fun sendMessage(message: String) {
@@ -103,7 +114,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
         )
 
         chatAdapter.addItem(chatItem)
-
+        playSound()
         binding.rvChats.post {
             binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
         }
@@ -152,7 +163,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
             addItemDecoration(
                 FixedOffsetDividerDecoration2(
                     this@ChatActivity,
-                    48,
+                    8,
                     8,
                     8,
                     8,
@@ -188,5 +199,24 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
                 Toast.makeText(this, "attach", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun playSound() {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val thePlayer = MediaPlayer.create(
+            this,
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        )
+
+        try {
+            thePlayer.setVolume(
+                (audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION) / 7.0).toFloat(),
+                (audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION) / 7.0).toFloat()
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        //thePlayer.start()
     }
 }

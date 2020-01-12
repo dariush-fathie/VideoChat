@@ -46,43 +46,52 @@
         <LinearLayout
             android:id="@+id/ll_write"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:background="@color/white"
-            android:gravity="center_vertical"
+            android:gravity="bottom"
+            android:minHeight="56dp"
             android:orientation="horizontal"
+            android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/et_message"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/round_solid_on_surface"
                 android:fontFamily="@font/fira_sans"
+                android:gravity="center_vertical"
                 android:hint="write a message ..."
-                android:imeOptions="actionSend|actionDone"
-                android:inputType="text"
+                android:imeOptions="actionDone"
+                android:inputType="textMultiLine"
+                android:lineSpacingExtra="1.06dp"
+                android:maxHeight="120dp"
+                android:minHeight="40dp"
                 android:paddingStart="16dp"
-                android:paddingEnd="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
                 android:textColor="@color/text_on_on_surface"
-                android:textColorHint="@color/hint_on_on_surface" />
+                android:textColorHint="@color/hint_on_on_surface"
+                tools:lines="1"
+                tools:text="@string/lorem" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_send"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="12dp"
+                android:padding="8dp"
                 app:srcCompat="@drawable/ic_send_24dp"
                 app:tint="@color/colorPrimary" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_attach"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="12dp"
+                android:padding="8dp"
                 app:srcCompat="@drawable/ic_attach_24dp"
                 app:tint="@color/colorPrimary" />
 

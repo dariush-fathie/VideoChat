@@ -16,8 +16,8 @@ class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.Vi
     private val dataSet = ArrayList<ChatItem>()
 
     companion object {
-        private const val MY_CHAT_TYPE = 0
-        private const val RECEIVED_CHAT_TYPE = 1
+        const val MY_CHAT_TYPE = 0
+        const val RECEIVED_CHAT_TYPE = 1
     }
 
     private fun getItem(position: Int): ChatItem {

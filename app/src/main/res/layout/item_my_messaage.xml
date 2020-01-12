@@ -1,63 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
-    <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/on_surface"
-        app:cardElevation="2dp"
-        app:shapeAppearance="@style/RightAngleShapeAppearance">
+        android:background="@color/transparent">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:orientation="horizontal"
             android:padding="8dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_message"
-                style="@style/TextAppearance.MaterialComponents.Body1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:fontFamily="@font/fira_sans"
-                tools:text="this is sample chat item" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_time"
-                    style="@style/TextAppearance.MaterialComponents.Caption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="15 min" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/iv_delivery"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_centerVertical="true"
-                    android:layout_toStartOf="@id/iv_replay"
-                    android:padding="8dp"
-                    app:srcCompat="@drawable/ic_check_24dp" />
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="0"
+                android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iv_replay"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="end"
                     android:padding="6dp"
+                    android:scaleX="-1"
                     app:srcCompat="@drawable/ic_reply_24dp" />
-            </RelativeLayout>
+
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/message_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#00FF00"
+                app:cardBackgroundColor="@color/on_surface"
+                app:contentPaddingBottom="4dp"
+                app:contentPaddingLeft="8dp"
+                app:contentPaddingRight="8dp"
+                app:contentPaddingTop="4dp"
+                app:shapeAppearance="@style/RightAngleShapeAppearance">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="80dp"
+                        tools:lines="5"
+                        tools:maxLength="200"
+                        tools:text="@tools:sample/lorem/random" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_time"
+                            style="@style/TextAppearance.MaterialComponents.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="15 min" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/iv_delivery"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            app:srcCompat="@drawable/ic_check_24dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-</layout>
 
+    </RelativeLayout>
+</layout>

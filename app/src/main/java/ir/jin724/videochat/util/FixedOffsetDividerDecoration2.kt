@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import ir.jin724.videochat.ui.chat.ChatAdapter
+
 
 class FixedOffsetDividerDecoration2(
     context: Context,
@@ -39,7 +41,12 @@ class FixedOffsetDividerDecoration2(
             (view.layoutParams as RecyclerView.LayoutParams).viewAdapterPosition
         val itemCount = parent.adapter?.itemCount
 
+        val viewType = parent.adapter!!.getItemViewType(itemPosition)
         outRect.set(leftDp, topDp, rightDp, bottomDp)
+
+        if (viewType == ChatAdapter.RECEIVED_CHAT_TYPE){
+            outRect.set(rightDp, topDp, leftDp, bottomDp)
+        }
 
         /*if (itemPosition == itemCount?.minus(1)) {
             outRect.bottom = bottomDp

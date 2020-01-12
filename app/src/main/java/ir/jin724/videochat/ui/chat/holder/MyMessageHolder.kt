@@ -11,7 +11,7 @@ class MyMessageHolder(private val binding: ItemMyMessaageBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
     fun bind(chatItem: ChatItem) {
-        binding.tvMessage.text = "$adapterPosition${chatItem.text}"
+        binding.tvMessage.text = chatItem.text
         binding.tvTime.text = chatItem.time
 
         binding.ivDelivery.setImageResIf(
