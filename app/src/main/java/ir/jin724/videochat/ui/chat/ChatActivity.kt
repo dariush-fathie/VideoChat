@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -21,9 +20,8 @@ import ir.jin724.videochat.data.chatRepository.ChatItem
 import ir.jin724.videochat.data.userRepository.User
 import ir.jin724.videochat.databinding.ActivityChatBinding
 import ir.jin724.videochat.util.ChatUtil
-import ir.jin724.videochat.util.FixedOffsetDividerDecoration2
+import ir.jin724.videochat.util.ChatDecoration
 import ir.jin724.videochat.util.GlideApp
-import ir.jin724.videochat.util.KeyboardUtil
 
 class ChatActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -160,17 +158,9 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
                         stackFromEnd = true
                         isSmoothScrollbarEnabled = true
                     }
-            addItemDecoration(
-                FixedOffsetDividerDecoration2(
-                    this@ChatActivity,
-                    8,
-                    8,
-                    8,
-                    8,
-                    false,
-                    1
-                )
-            )
+            /*addItemDecoration(
+                ChatDecoration(this@ChatActivity , 8)
+            )*/
             chatAdapter = ChatAdapter(me)
             adapter = chatAdapter
         }

@@ -10,67 +10,80 @@
         android:background="@color/transparent">
 
         <LinearLayout
+            android:baselineAligned="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="8dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/message_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="#00FF00"
-                app:contentPaddingBottom="4dp"
-                app:contentPaddingLeft="8dp"
-                app:contentPaddingRight="8dp"
-                app:contentPaddingTop="4dp"
-                app:shapeAppearance="@style/LeftAngleShapeAppearance">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_message"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="80dp"
-                        tools:lines="4"
-                        tools:text="@tools:sample/lorem/random" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tv_time"
-                            style="@style/TextAppearance.MaterialComponents.Caption"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="15 min" />
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/iv_delivery"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            app:srcCompat="@drawable/ic_check_24dp" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-
-            </com.google.android.material.card.MaterialCardView>
+            android:paddingTop="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/message_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#00FF00"
+                    app:contentPaddingBottom="4dp"
+                    app:contentPaddingLeft="8dp"
+                    app:contentPaddingRight="8dp"
+                    app:contentPaddingTop="4dp"
+                    app:shapeAppearance="@style/LeftAngleShapeAppearance">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_message"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:minWidth="80dp"
+                            tools:lines="4"
+                            tools:text="@tools:sample/lorem/random" />
+
+                    </LinearLayout>
+
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_time"
+                        style="@style/TextAppearance.MaterialComponents.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15 min" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_delivery"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        app:srcCompat="@drawable/ic_check_24dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="0"
                 android:orientation="vertical">
 
@@ -78,13 +91,12 @@
                     android:id="@+id/iv_replay"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:padding="6dp"
+                    android:padding="7dp"
                     app:srcCompat="@drawable/ic_reply_24dp" />
 
             </LinearLayout>
 
         </LinearLayout>
     </RelativeLayout>
-
 
 </layout>
