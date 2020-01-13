@@ -28,15 +28,16 @@ class ChatDecoration(
         val viewType = parent.adapter!!.getItemViewType(itemPosition)
 
         // last item (first item if itemCount = 1)
-        outRect.bottom = spacePx * 2
+        outRect.bottom = spacePx
 
         if (itemPosition == itemCount.minus(1)) {
             outRect.bottom = spacePx * 2
         }
 
+
         // first item
         if (itemPosition == 0) {
-            outRect.top == spacePx * 2
+            // outRect.top == spacePx * 2
         }
 
     }

@@ -10,8 +10,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import ir.jin724.videochat.R
@@ -20,8 +22,11 @@ import ir.jin724.videochat.data.chatRepository.ChatItem
 import ir.jin724.videochat.data.userRepository.User
 import ir.jin724.videochat.databinding.ActivityChatBinding
 import ir.jin724.videochat.util.ChatUtil
-import ir.jin724.videochat.util.ChatDecoration
 import ir.jin724.videochat.util.GlideApp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ChatActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -59,6 +64,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
         setUpObservers()
     }
 
+    private lateinit var job: Job
     private fun setUpObservers() {
         viewModel.sendChatResult.observe(this) {
             chatAdapter.delivered(it)
@@ -72,6 +78,26 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
             playSound()
             binding.rvChats.post {
                 binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
+            }
+        }
+
+
+
+        viewModel.isWritingEvent.observe(this) {
+            binding.toolbar.subtitle = "is writing..."
+            lifecycleScope.launch {
+                try {
+                    job.cancel()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                job = launch {
+                    delay(800)
+                    launch(lifecycleScope.coroutineContext) {
+                        binding.toolbar.subtitle = bob.firstName + " " + bob.lastName
+                    }
+                }
             }
         }
     }
@@ -97,6 +123,10 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
             }
             return@setOnEditorActionListener false
         }*/
+
+        binding.etMessage.doOnTextChanged { text, _, _, _ ->
+            viewModel.emitIsWriting(me, bob)
+        }
     }
 
     private fun sendMessage(message: String) {

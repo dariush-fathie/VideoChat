@@ -1,6 +1,7 @@
 package ir.jin724.videochat.data.userRepository
 
 import android.os.Parcelable
+import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
@@ -34,5 +35,9 @@ data class User(
 ) : Parcelable {
 
     fun isOnline() = state == "online"
+
+    fun toJson(gson: Gson): String? {
+        return gson.toJson(this, this::class.java)
+    }
 
 }
