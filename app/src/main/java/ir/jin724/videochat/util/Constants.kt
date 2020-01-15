@@ -12,4 +12,7 @@ object Constants {
     const val YOU_ARE_ONLINE = "youAreOnline"
     const val IS_WRITING = "is_writing"
 
+    const val WEB_RTC_CONFIG = "webRTCConfiguration"
+
+
 }

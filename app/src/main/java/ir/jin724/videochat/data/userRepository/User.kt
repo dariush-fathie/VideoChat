@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import ir.jin724.videochat.VideoChatApp
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -36,8 +37,8 @@ data class User(
 
     fun isOnline() = state == "online"
 
-    fun toJson(gson: Gson): String? {
-        return gson.toJson(this, this::class.java)
+    fun toJson(): String? {
+        return VideoChatApp.gson.toJson(this, this::class.java)
     }
 
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.media.AudioManager
 import ir.jin724.videochat.VideoChatApp
+import ir.jin724.videochat.util.toIce
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.*
@@ -11,21 +12,23 @@ import timber.log.Timber
 
 class WebRTCClient(
     private val context: Application,
+    private val config: WebRTCConfig,
     private val localViewRenderer: SurfaceViewRenderer,
     private val remoteViewRenderer: SurfaceViewRenderer
 ) {
 
     companion object {
-        private const val LOCAL_TRACK_ID = "local_track"
-        private const val LOCAL_STREAM_ID = "local_track"
+        private const val LOCAL_VIDEO_TRACK_ID = "local_audio_track"
+        private const val LOCAL_AUDIO_TRACK_ID = "local_audio_track"
+        private const val LOCAL_STREAM_ID = "local_stream_id"
 
         private const val OFFER = "offer"
         private const val ANSWER = "answer"
         private const val CANDIDATE = "candidate"
 
-        private const val SDP_MID = "sdpMid"
-        private const val SDP_M_LINE_INDEX = "sdpMLineIndex"
-        private const val SDP = "sdp"
+        const val SDP_MID = "sdpMid"
+        const val SDP_M_LINE_INDEX = "sdpMLineIndex"
+        const val SDP = "sdp"
 
         private val TAG = this::class.java.simpleName
     }
@@ -47,7 +50,7 @@ class WebRTCClient(
                 //signallingClient.send(p0)
                 // todo send ice candidate
                 //dataRepo.sendData(p0)
-                socket.emit(CANDIDATE, p0)
+                socket.emit(CANDIDATE, p0, config.bob.toJson())
                 addIceCandidate(p0)
             }
 
@@ -59,13 +62,15 @@ class WebRTCClient(
 
             override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {
                 super.onIceCandidatesRemoved(p0)
-                p0?.let { remoteIceCandidate(it) }
+                p0?.let {
+                    remoteIceCandidate(it)
+                }
                 // todo send remote ice candidate
             }
 
+
         }
     }
-
 
 
     private fun initSocket() {
@@ -99,6 +104,7 @@ class WebRTCClient(
                     SessionDescription.Type.ANSWER,
                     obj.getString(SDP)
                 )
+
                 setRemoteSessionDescription(sdp)
                 answer()
             } catch (e: JSONException) {
@@ -108,31 +114,30 @@ class WebRTCClient(
             try {
                 val obj = args[0] as JSONObject
                 addIceCandidate(
-                    IceCandidate(
-                        obj.getString(SDP_MID),
-                        obj.getInt(SDP_M_LINE_INDEX),
-                        obj.getString(SDP)
-                    )
+                    obj.toIce()
                 )
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
         }
 
-        socket.connect()
+        // todo check this later . maybe there is no need to connect again
+        // socket.connect()
     }
 
     private val iceServer = listOf(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
-            .createIceServer(),
+            .createIceServer()/*,
+
         PeerConnection.IceServer.builder("stun:194.5.175.240:3478")
             .setUsername("kaptaRTC")
             .setPassword("17551755")
             .createIceServer(),
+
         PeerConnection.IceServer.builder("turn:194.5.175.240:3478")
             .setUsername("kaptaRTC")
             .setPassword("17551755")
-            .createIceServer()
+            .createIceServer()*/
     )
 
     private val peerConnectionFactory by lazy {
@@ -144,7 +149,7 @@ class WebRTCClient(
     }
 
     private val localVideoSource by lazy {
-        peerConnectionFactory.createVideoSource(false)
+        peerConnectionFactory.createVideoSource(config.isScreenCast, config.alignTimeStamps)
     }
 
     private val localAudioSource by lazy {
@@ -159,26 +164,26 @@ class WebRTCClient(
         initSurfaceView(localViewRenderer)
         initSurfaceView(remoteViewRenderer)
         initPeerConnectionFactory(context)
-
         startLocalVideoCapture(localViewRenderer)
-
-        /*sdbObserver = object : CustomSdbObserver() {
-
-        }*/
-
         initSocket()
     }
 
 
-
     private fun initPeerConnectionFactory(context: Application) {
         // init peerConnectionFactory options globally
-        val options = PeerConnectionFactory.InitializationOptions.builder(context)
+        /*val options = PeerConnectionFactory.InitializationOptions.builder(context)
             .setEnableInternalTracer(true)
             .setFieldTrials("WebRTC-H264HighProfile/Enabled/")
             .createInitializationOptions()
-        PeerConnectionFactory.initialize(options)
+        PeerConnectionFactory.initialize(options)*/
+        PeerConnectionFactory.initialize(
+            PeerConnectionFactory
+                .InitializationOptions
+                .builder(context)
+                .createInitializationOptions()
+        )
     }
+
 
     private fun buildPeerConnectionFactory(): PeerConnectionFactory {
         // build an instance of peerConnectionFactory
@@ -192,26 +197,28 @@ class WebRTCClient(
                     true
                 )
             )
-            // overriding options to add more option
+            /*// overriding options to add more option
             .setOptions(PeerConnectionFactory.Options().apply {
                 disableEncryption = true
                 disableNetworkMonitor = true
-            })
+            })*/
             .createPeerConnectionFactory()
     }
 
+
     private fun buildPeerConnection(): PeerConnection? {
         val rtcConfiguration = PeerConnection.RTCConfiguration(iceServer)
-        /*with(rtcConfiguration) {
-            *//*bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
-            enableDtlsSrtp = true
-            enableRtpDataChannel = true*//*
-        }*/
+        with(rtcConfiguration) {
+            // bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
+            // enableDtlsSrtp = true
+            //enableRtpDataChannel = config.enableRtpDataChannel
+        }
         return peerConnectionFactory.createPeerConnection(
             rtcConfiguration,
             observer
         )
     }
+
 
     private fun createVideoCapturer(context: Context): CameraVideoCapturer {
         Timber.e("getVideoCapturer")
@@ -238,15 +245,18 @@ class WebRTCClient(
             localVideoSource.capturerObserver
         )
 
+        // todo get resolution an fps from config
         videoCapturer.startCapture(1920, 1080, 60)
 
         val localVideoTrack =
-            peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
+            peerConnectionFactory.createVideoTrack(LOCAL_VIDEO_TRACK_ID, localVideoSource)
         localVideoTrack.addSink(localSurfaceRenderer)
+
         val localStream = peerConnectionFactory.createLocalMediaStream(LOCAL_STREAM_ID)
 
         //create an AudioSource instance
-        val localAudioTrack = peerConnectionFactory.createAudioTrack("101", localAudioSource)
+        val localAudioTrack =
+            peerConnectionFactory.createAudioTrack(LOCAL_AUDIO_TRACK_ID, localAudioSource)
 
         /*WebRtcAudioManager.setStereoOutput(true)
         WebRtcAudioManager.setStereoOutput(true)*/
@@ -256,6 +266,7 @@ class WebRTCClient(
         peerConnection?.addStream(localStream)
     }
 
+
     private fun initSurfaceView(view: SurfaceViewRenderer) = view.run {
         setMirror(true)
         setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
@@ -264,51 +275,74 @@ class WebRTCClient(
     }
 
     private fun setLocalSessionDescription(sessionDescription: SessionDescription) {
-        peerConnection?.setLocalDescription(object : CustomSdbObserver() {}, sessionDescription)
+        peerConnection?.setLocalDescription(CustomSdbObserver(), sessionDescription)
     }
 
     private fun setRemoteSessionDescription(sessionDescription: SessionDescription) {
-        peerConnection?.setRemoteDescription(object : CustomSdbObserver() {}, sessionDescription)
+        peerConnection?.setRemoteDescription(CustomSdbObserver(), sessionDescription)
+    }
+
+
+    private fun createMediaConstraints(): MediaConstraints {
+        return MediaConstraints().apply {
+            mandatory.add(
+                MediaConstraints.KeyValuePair(
+                    "OfferToReceiveVideo",
+                    "true"
+                )
+            )
+            mandatory.add(
+                MediaConstraints.KeyValuePair(
+                    "OfferToReceiveAudio", "true"
+                )
+            )
+        }
     }
 
 
     fun call() {
         with(peerConnection!!) {
-            val constraints = MediaConstraints().apply {
-                mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
-                mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
-            }
-
             createOffer(object : CustomSdbObserver() {
                 override fun onCreateSuccess(p0: SessionDescription?) {
                     super.onCreateSuccess(p0)
+                    Timber.e("onCreateSuccess")
+
                     // todo send offer
                     // dataRepo.sendData(p0)
                     // درخواست اتصال ارسال می شود
-                    socket.emit(OFFER, p0)
+                    socket.emit(OFFER, p0, config.bob.toJson())
                     setLocalSessionDescription(p0!!)
                 }
-            }, constraints)
+
+                override fun onCreateFailure(p0: String?) {
+                    super.onCreateFailure(p0)
+                    Timber.e("onCreateFailure $p0")
+                }
+
+                override fun onSetFailure(p0: String?) {
+                    super.onSetFailure(p0)
+                    Timber.e("onSetFailure $p0")
+                }
+            }, createMediaConstraints())
         }
     }
 
     fun answer() {
         with(peerConnection!!) {
-            val constraints = MediaConstraints().apply {
-                mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
-                mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
-            }
-
             createAnswer(object : CustomSdbObserver() {
                 override fun onCreateSuccess(p0: SessionDescription?) {
                     super.onCreateSuccess(p0)
                     // todo send answer
                     // dataRepo.sendData(p0)
-                    socket.emit(ANSWER, p0)
+                    socket.emit(ANSWER, p0, config.bob.toJson())
                     setLocalSessionDescription(p0!!)
                 }
-            }, constraints)
+            }, createMediaConstraints())
         }
+    }
+
+    fun dispose() {
+        peerConnection?.dispose()
     }
 
     /*fun onRemoteSessionReceived(sessionDescription: SessionDescription) {
@@ -322,9 +356,14 @@ class WebRTCClient(
     fun remoteIceCandidate(removedIce: Array<out IceCandidate>) {
         peerConnection?.removeIceCandidates(removedIce)
     }
-
-
 }
+
+
+/*
+* todo :
+* videoSource adapt format : aspectRatio, max and min width
+*
+* */
 
 
 

@@ -45,7 +45,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun setUpSocket() {
         socket.on(Constants.NEW_MESSAGE) {
-            val chatItem = VideoChatApp.gson.fromJson<ChatItem>(
+            val chatItem = gson.fromJson<ChatItem>(
                 (it[0] as JSONObject).toString(),
                 ChatItem::class.java
             )
@@ -65,7 +65,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun emitIsWriting(me: User, bob: User) {
-        socket.emit(Constants.IS_WRITING , me.toJson(gson) , bob.toJson(gson))
+        socket.emit(Constants.IS_WRITING , me.toJson() , bob.toJson())
     }
 
     val isWritingEvent = isWritingTrigger.map {

@@ -1,6 +1,7 @@
 package ir.jin724.videochat.ui.chat
 
 import android.content.Context
+import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
@@ -21,10 +22,12 @@ import ir.jin724.videochat.VideoChatApp
 import ir.jin724.videochat.data.chatRepository.ChatItem
 import ir.jin724.videochat.data.userRepository.User
 import ir.jin724.videochat.databinding.ActivityChatBinding
+import ir.jin724.videochat.ui.call.WebRTCActivity
 import ir.jin724.videochat.util.ChatUtil
+import ir.jin724.videochat.util.Constants
 import ir.jin724.videochat.util.GlideApp
+import ir.jin724.videochat.webRTC.WebRTCConfig
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -85,6 +88,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
 
         viewModel.isWritingEvent.observe(this) {
             binding.toolbar.subtitle = "is writing..."
+
             lifecycleScope.launch {
                 try {
                     job.cancel()
@@ -99,6 +103,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
             }
+
         }
     }
 
@@ -171,9 +176,12 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> finish()
+            R.id.menu_video_call -> videoCall()
+            R.id.menu_voice_call -> voiceCall()
         }
         return super.onOptionsItemSelected(item)
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.chat_menu, menu)
@@ -239,4 +247,18 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
 
         //thePlayer.start()
     }
+
+
+    private fun voiceCall() {
+        startActivity(Intent(this, WebRTCActivity::class.java).apply {
+            putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob))
+        })
+    }
+
+    private fun videoCall() {
+        startActivity(Intent(this, WebRTCActivity::class.java).apply {
+            putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob, videoEnabled = false))
+        })
+    }
+
 }

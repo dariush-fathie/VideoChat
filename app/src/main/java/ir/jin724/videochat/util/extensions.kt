@@ -8,6 +8,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
+import ir.jin724.videochat.webRTC.WebRTCClient
+import org.json.JSONObject
+import org.webrtc.IceCandidate
 
 fun ViewGroup.inflater(): LayoutInflater {
     return LayoutInflater.from(context)
@@ -47,4 +50,12 @@ fun Int.toPx(context: Context): Float {
 
 fun Float.toPx(context: Context): Float {
     return Converter.pxFromDp(context, this)
+}
+
+fun JSONObject.toIce(): IceCandidate {
+    return IceCandidate(
+        getString(WebRTCClient.SDP_MID),
+        getInt(WebRTCClient.SDP_M_LINE_INDEX),
+        getString(WebRTCClient.SDP)
+    )
 }
