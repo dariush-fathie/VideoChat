@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.media.AudioManager
 import ir.jin724.videochat.VideoChatApp
-import ir.jin724.videochat.util.toIce
-import org.json.JSONException
+import ir.jin724.videochat.VideoChatApp.Companion.gson
+import ir.jin724.videochat.data.userRepository.User
 import org.json.JSONObject
 import org.webrtc.*
 import timber.log.Timber
@@ -18,17 +18,24 @@ class WebRTCClient(
 ) {
 
     companion object {
-        private const val LOCAL_VIDEO_TRACK_ID = "local_audio_track"
+        private const val LOCAL_VIDEO_TRACK_ID = "local_video_track"
         private const val LOCAL_AUDIO_TRACK_ID = "local_audio_track"
         private const val LOCAL_STREAM_ID = "local_stream_id"
 
         private const val OFFER = "offer"
         private const val ANSWER = "answer"
         private const val CANDIDATE = "candidate"
+        private const val DISPOSE = "dispose"
+        private const val UNAVAILABLE = "unavailable"
 
         const val SDP_MID = "sdpMid"
         const val SDP_M_LINE_INDEX = "sdpMLineIndex"
         const val SDP = "sdp"
+
+
+        const val SOCKET_PAYLOAD_SESSION_DESCRIPTION = "sd"
+        const val SOCKET_PAYLOAD_ICE_CANDIDATE = "ice"
+        const val SOCKET_PAYLOAD_BOB = "bob"
 
         private val TAG = this::class.java.simpleName
     }
@@ -37,11 +44,13 @@ class WebRTCClient(
     private val rootEglBase: EglBase = EglBase.create()
     private val observer: PeerConnection.Observer
 
+    private val audioManager: AudioManager =
+        context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
 
     init {
-        val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        mAudioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-        mAudioManager.isSpeakerphoneOn = true
+        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        audioManager.isSpeakerphoneOn = true
 
         observer = object : PeerConnectionObserver() {
             override fun onIceCandidate(p0: IceCandidate?) {
@@ -50,7 +59,11 @@ class WebRTCClient(
                 //signallingClient.send(p0)
                 // todo send ice candidate
                 //dataRepo.sendData(p0)
-                socket.emit(CANDIDATE, p0, config.bob.toJson())
+                socket.emit(
+                    CANDIDATE,
+                    gson.toJson(p0, IceCandidate::class.java),
+                    config.bob.toJson()
+                )
                 addIceCandidate(p0)
             }
 
@@ -74,70 +87,105 @@ class WebRTCClient(
 
 
     private fun initSocket() {
+        // this events comes from bob
         socket.on(OFFER) { args ->
             // یک درخواست از کاربری دیگر امده است
             //  باید session کاربر ذخیره شود و پاسخ او را بدهیم
             // البته ممکن است نخواهیم پاسخ دهیم که باید کنترل شدو
-            try {
-                val obj = args[0] as JSONObject
 
-                // remote use session
-                val sdp = SessionDescription(
-                    SessionDescription.Type.OFFER,
-                    obj.getString(SDP)
+            // <--- args structure -->
+            // { "sd" : {sessionDescription} , "bob" : {Bob} }
+
+            val wrapperObject = args[0] as JSONObject
+
+            if (!wrapperObject.has(SOCKET_PAYLOAD_SESSION_DESCRIPTION) || !wrapperObject.has(
+                    SOCKET_PAYLOAD_BOB
                 )
-                // باید بررسی شود آیا کاربر می تواند در این لحظه پاسخگو باشد یا نه
-                setRemoteSessionDescription(sdp)
-                call()
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
+            )
+                throw Exception("sd or bob is not available. please check offer emit at nodeJs server")
+
+            val sdp = gson.fromJson<SessionDescription>(
+                wrapperObject.get(SOCKET_PAYLOAD_SESSION_DESCRIPTION).toString(),
+                SessionDescription::class.java
+            )
+
+            val bob = gson.fromJson<User>(
+                wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
+                User::class.java
+            )
+
+            Timber.e("sdp from bob :", sdp.toString())
+            Timber.e("bob user :", bob.toString())
+
+
+            // باید بررسی شود آیا کاربر می تواند در این لحظه پاسخگو باشد یا نه
+            setRemoteSessionDescription(sdp)
+            answer()
+
         }.on(ANSWER) { args ->
+
             // درخواست ما پاسخ داده شده است
             // پس طرف مقابل session خود را برای ما ارسال می کند تا اتصال برقرار شود
             // البته ممکن است پاسخ ندهد که باید کنترل شود
-            try {
-                val obj = args[0] as JSONObject
 
-                // remote use session
-                val sdp = SessionDescription(
-                    SessionDescription.Type.ANSWER,
-                    obj.getString(SDP)
+            val wrapperObject = args[0] as JSONObject
+
+            if (!wrapperObject.has(SOCKET_PAYLOAD_SESSION_DESCRIPTION) || !wrapperObject.has(
+                    SOCKET_PAYLOAD_BOB
                 )
+            )
+                throw Exception("sd or bob is not available. please check answer emit at nodeJs server")
 
-                setRemoteSessionDescription(sdp)
-                answer()
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
+            val sdp = gson.fromJson<SessionDescription>(
+                wrapperObject.get(SOCKET_PAYLOAD_SESSION_DESCRIPTION).toString(),
+                SessionDescription::class.java
+            )
+
+            val bob = gson.fromJson<User>(
+                wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
+                User::class.java
+            )
+
+            Timber.e("sdp from bob :", sdp.toString())
+            Timber.e("bob user :", bob.toString())
+
+            setRemoteSessionDescription(sdp)
+            //answer()
         }.on(CANDIDATE) { args ->
-            try {
-                val obj = args[0] as JSONObject
-                addIceCandidate(
-                    obj.toIce()
+            val wrapperObject = args[0] as JSONObject
+
+            if (!wrapperObject.has(SOCKET_PAYLOAD_ICE_CANDIDATE) || !wrapperObject.has(
+                    SOCKET_PAYLOAD_BOB
                 )
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
+            )
+                throw Exception("sd or bob is not available. please check candidate emit at nodeJs server")
+
+            val ice = gson.fromJson<IceCandidate>(
+                wrapperObject.get(SOCKET_PAYLOAD_ICE_CANDIDATE).toString(),
+                IceCandidate::class.java
+            )
+
+            val bob = gson.fromJson<User>(
+                wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
+                User::class.java
+            )
+
+            Timber.e("ice candidate", ice.toString())
+            Timber.e("bob user", bob.toString())
+
+            addIceCandidate(ice)
         }
 
-        // todo check this later . maybe there is no need to connect again
-        // socket.connect()
+
     }
 
     private val iceServer = listOf(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
-            .createIceServer()/*,
-
+            .createIceServer(),
         PeerConnection.IceServer.builder("stun:194.5.175.240:3478")
             .setUsername("kaptaRTC")
             .setPassword("17551755")
-            .createIceServer(),
-
-        PeerConnection.IceServer.builder("turn:194.5.175.240:3478")
-            .setUsername("kaptaRTC")
-            .setPassword("17551755")
-            .createIceServer()*/
+            .createIceServer()
     )
 
     private val peerConnectionFactory by lazy {
@@ -171,17 +219,11 @@ class WebRTCClient(
 
     private fun initPeerConnectionFactory(context: Application) {
         // init peerConnectionFactory options globally
-        /*val options = PeerConnectionFactory.InitializationOptions.builder(context)
+        val options = PeerConnectionFactory.InitializationOptions.builder(context)
             .setEnableInternalTracer(true)
             .setFieldTrials("WebRTC-H264HighProfile/Enabled/")
             .createInitializationOptions()
-        PeerConnectionFactory.initialize(options)*/
-        PeerConnectionFactory.initialize(
-            PeerConnectionFactory
-                .InitializationOptions
-                .builder(context)
-                .createInitializationOptions()
-        )
+        PeerConnectionFactory.initialize(options)
     }
 
 
@@ -197,11 +239,11 @@ class WebRTCClient(
                     true
                 )
             )
-            /*// overriding options to add more option
+            // overriding options to add more option
             .setOptions(PeerConnectionFactory.Options().apply {
                 disableEncryption = true
                 disableNetworkMonitor = true
-            })*/
+            })
             .createPeerConnectionFactory()
     }
 
@@ -288,12 +330,12 @@ class WebRTCClient(
             mandatory.add(
                 MediaConstraints.KeyValuePair(
                     "OfferToReceiveVideo",
-                    "true"
+                    "${config.videoEnabled}"
                 )
             )
             mandatory.add(
                 MediaConstraints.KeyValuePair(
-                    "OfferToReceiveAudio", "true"
+                    "OfferToReceiveAudio", "${config.audioEnabled}"
                 )
             )
         }
@@ -304,13 +346,17 @@ class WebRTCClient(
         with(peerConnection!!) {
             createOffer(object : CustomSdbObserver() {
                 override fun onCreateSuccess(p0: SessionDescription?) {
-                    super.onCreateSuccess(p0)
                     Timber.e("onCreateSuccess")
 
                     // todo send offer
                     // dataRepo.sendData(p0)
                     // درخواست اتصال ارسال می شود
-                    socket.emit(OFFER, p0, config.bob.toJson())
+                    socket.emit(
+                        OFFER,
+                        gson.toJson(p0, SessionDescription::class.java),
+                        config.bob.toJson()
+                    )
+
                     setLocalSessionDescription(p0!!)
                 }
 
@@ -334,7 +380,11 @@ class WebRTCClient(
                     super.onCreateSuccess(p0)
                     // todo send answer
                     // dataRepo.sendData(p0)
-                    socket.emit(ANSWER, p0, config.bob.toJson())
+                    socket.emit(
+                        ANSWER,
+                        gson.toJson(p0, SessionDescription::class.java),
+                        config.bob.toJson()
+                    )
                     setLocalSessionDescription(p0!!)
                 }
             }, createMediaConstraints())
@@ -342,7 +392,39 @@ class WebRTCClient(
     }
 
     fun dispose() {
-        peerConnection?.dispose()
+        // close peer connection and release view renderer's
+        try {
+            // remove event listener from socket
+            socket.off(OFFER)
+            socket.off(ANSWER)
+            socket.off(CANDIDATE)
+
+
+            // reset audio manager
+            audioManager.mode = AudioManager.MODE_NORMAL
+            audioManager.isSpeakerphoneOn = false
+
+            localAudioSource?.dispose()
+            localVideoSource?.dispose()
+
+            remoteViewRenderer.pauseVideo()
+            localViewRenderer.pauseVideo()
+
+            localViewRenderer.clearImage()
+            remoteViewRenderer.clearImage()
+
+            localViewRenderer.release()
+            remoteViewRenderer.release()
+
+            peerConnection?.stopRtcEventLog()
+            peerConnection?.dispose()
+            peerConnection?.close()
+
+
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+
     }
 
     /*fun onRemoteSessionReceived(sessionDescription: SessionDescription) {

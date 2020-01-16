@@ -13,6 +13,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
+import java.security.Provider
+import java.security.Security
 
 
 class VideoChatApp : Application() {
@@ -20,11 +22,12 @@ class VideoChatApp : Application() {
     companion object {
         private const val SIGNALING_URI = Constants.BASE_URL
 
-        private val loggingInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message ->
-            if (BuildConfig.DEBUG) {
-                Timber.tag("OkHttp").e(message)
-            }
-        }).setLevel(HttpLoggingInterceptor.Level.BODY)
+        private val loggingInterceptor =
+            HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message ->
+                if (BuildConfig.DEBUG) {
+                    Timber.tag("OkHttp").e(message)
+                }
+            }).setLevel(HttpLoggingInterceptor.Level.BODY)
 
         private val client = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -40,17 +43,20 @@ class VideoChatApp : Application() {
     }
 
     val socket: Socket by lazy { IO.socket(SIGNALING_URI) }
-    lateinit var prefsManager :PrefsManager
+    lateinit var prefsManager: PrefsManager
 
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
         prefsManager = PrefsManager(this)
+
+        //ProviderUtil.allAlgorithm()
     }
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         MultiDex.install(base)
     }
+
 
 }
