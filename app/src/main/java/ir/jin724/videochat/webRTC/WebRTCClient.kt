@@ -182,10 +182,16 @@ class WebRTCClient(
     private val iceServer = listOf(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
             .createIceServer(),
+
         PeerConnection.IceServer.builder("stun:194.5.175.240:3478")
             .setUsername("kaptaRTC")
             .setPassword("17551755")
+            .createIceServer(),
+        PeerConnection.IceServer.builder("turn:194.5.175.240:3478")
+            .setUsername("kaptaRTC")
+            .setPassword("17551755")
             .createIceServer()
+
     )
 
     private val peerConnectionFactory by lazy {
