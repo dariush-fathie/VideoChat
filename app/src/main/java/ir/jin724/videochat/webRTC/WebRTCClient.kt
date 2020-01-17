@@ -8,7 +8,9 @@ import ir.jin724.videochat.VideoChatApp.Companion.gson
 import ir.jin724.videochat.data.userRepository.User
 import org.json.JSONObject
 import org.webrtc.*
+import org.webrtc.audio.JavaAudioDeviceModule
 import timber.log.Timber
+
 
 class WebRTCClient(
     private val context: Application,
@@ -21,6 +23,11 @@ class WebRTCClient(
         private const val LOCAL_VIDEO_TRACK_ID = "local_video_track"
         private const val LOCAL_AUDIO_TRACK_ID = "local_audio_track"
         private const val LOCAL_STREAM_ID = "local_stream_id"
+
+        private const val AUDIO_ECHO_CANCELLATION_CONSTRAINT = "googEchoCancellation"
+        private const val AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT = "googAutoGainControl"
+        private const val AUDIO_HIGH_PASS_FILTER_CONSTRAINT = "googHighpassFilter"
+        private const val AUDIO_NOISE_SUPPRESSION_CONSTRAINT = "googNoiseSuppression"
 
         private const val OFFER = "offer"
         private const val ANSWER = "answer"
@@ -71,6 +78,47 @@ class WebRTCClient(
                 super.onAddStream(p0)
                 Timber.tag(TAG).e("onAddStream : ${p0?.toString()}")
                 p0?.videoTracks?.get(0)?.addSink(remoteViewRenderer)
+
+                p0?.let { stream ->
+                    stream.audioTracks?.let {
+                        if (it.isNotEmpty()) {
+                            it.forEach { audioTrack ->
+                                // todo . what to do with audio tracks?
+                            }
+                        }
+                    }
+
+                    stream.videoTracks?.let {
+                        if (it.isNotEmpty()) {
+                            it.forEach { videoTrack ->
+                                videoTrack?.addSink(remoteViewRenderer)
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            override fun onRemoveStream(p0: MediaStream?) {
+                super.onRemoveStream(p0)
+
+                p0?.let { stream ->
+                    stream.audioTracks?.let {
+                        if (it.isNotEmpty()) {
+                            it.forEach { audioTrack ->
+                                // todo . what to do with audio tracks?
+                            }
+                        }
+                    }
+
+                    stream.videoTracks?.let {
+                        if (it.isNotEmpty()) {
+                            it.forEach { videoTrack ->
+                                videoTrack?.removeSink(remoteViewRenderer)
+                            }
+                        }
+                    }
+                }
             }
 
             override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {
@@ -80,7 +128,6 @@ class WebRTCClient(
                 }
                 // todo send remote ice candidate
             }
-
 
         }
     }
@@ -180,18 +227,18 @@ class WebRTCClient(
     }
 
     private val iceServer = listOf(
-        PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
+        /*PeerConnection.IceServer.builder("stun:stun.l.google.com:19302")
             .createIceServer(),
-
+*/
         PeerConnection.IceServer.builder("stun:194.5.175.240:3478")
             .setUsername("kaptaRTC")
             .setPassword("17551755")
             .createIceServer(),
+
         PeerConnection.IceServer.builder("turn:194.5.175.240:3478")
             .setUsername("kaptaRTC")
             .setPassword("17551755")
             .createIceServer()
-
     )
 
     private val peerConnectionFactory by lazy {
@@ -208,6 +255,20 @@ class WebRTCClient(
 
     private val localAudioSource by lazy {
         val audioConstraints = MediaConstraints()
+
+        audioConstraints.mandatory.add(
+            MediaConstraints.KeyValuePair(AUDIO_ECHO_CANCELLATION_CONSTRAINT, "true")
+        )
+        audioConstraints.mandatory.add(
+            MediaConstraints.KeyValuePair(AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT, "false")
+        )
+        audioConstraints.mandatory.add(
+            MediaConstraints.KeyValuePair(AUDIO_HIGH_PASS_FILTER_CONSTRAINT, "true")
+        )
+        audioConstraints.mandatory.add(
+            MediaConstraints.KeyValuePair(AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "true")
+        )
+
         peerConnectionFactory.createAudioSource(audioConstraints)
     }
 
@@ -216,7 +277,7 @@ class WebRTCClient(
 
     fun start() {
         initSurfaceView(localViewRenderer)
-        initSurfaceView(remoteViewRenderer)
+        initSurfaceView(remoteViewRenderer, true)
         initPeerConnectionFactory(context)
         startLocalVideoCapture(localViewRenderer)
         initSocket()
@@ -235,6 +296,8 @@ class WebRTCClient(
 
     private fun buildPeerConnectionFactory(): PeerConnectionFactory {
         // build an instance of peerConnectionFactory
+        //val adm = JavaAudioDeviceModule.builder(context).createAudioDeviceModule()
+
         return PeerConnectionFactory
             .builder()
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(rootEglBase.eglBaseContext))
@@ -269,6 +332,7 @@ class WebRTCClient(
 
 
     private fun createVideoCapturer(context: Context): CameraVideoCapturer {
+        //val fileVideoCapturer = FileVideoCapturer("");
         Timber.e("getVideoCapturer")
         return Camera2Enumerator(context).run {
             deviceNames.find {
@@ -315,12 +379,14 @@ class WebRTCClient(
     }
 
 
-    private fun initSurfaceView(view: SurfaceViewRenderer) = view.run {
-        setMirror(true)
-        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-        setEnableHardwareScaler(true)
-        init(rootEglBase.eglBaseContext, null)
-    }
+    private fun initSurfaceView(view: SurfaceViewRenderer, keepZOrderOverlay: Boolean = false) =
+        view.run {
+            setMirror(true)
+            setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+            setEnableHardwareScaler(true)
+            setZOrderMediaOverlay(keepZOrderOverlay)
+            init(rootEglBase.eglBaseContext, null)
+        }
 
     private fun setLocalSessionDescription(sessionDescription: SessionDescription) {
         peerConnection?.setLocalDescription(CustomSdbObserver(), sessionDescription)

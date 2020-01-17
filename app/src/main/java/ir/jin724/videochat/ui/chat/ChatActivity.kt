@@ -78,7 +78,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
 
         viewModel.liveNewMessage.observe(this) {
             chatAdapter.addItem(it)
-            playSound()
+            playSound(true)
             binding.rvChats.post {
                 binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
             }
@@ -147,7 +147,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
         )
 
         chatAdapter.addItem(chatItem)
-        playSound()
+        playSound(false)
         binding.rvChats.post {
             binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
         }
@@ -229,11 +229,11 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun playSound() {
+    private fun playSound(inMessage: Boolean) {
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val thePlayer = MediaPlayer.create(
             this,
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            if (inMessage) R.raw.sound_in else R.raw.sound_out
         )
 
         try {
@@ -245,19 +245,19 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
             e.printStackTrace()
         }
 
-        //thePlayer.start()
+        thePlayer.start()
     }
 
 
     private fun voiceCall() {
         startActivity(Intent(this, WebRTCActivity::class.java).apply {
-            putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob))
+            putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob , videoEnabled = false))
         })
     }
 
     private fun videoCall() {
         startActivity(Intent(this, WebRTCActivity::class.java).apply {
-            putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob, videoEnabled = false))
+            putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob))
         })
     }
 
