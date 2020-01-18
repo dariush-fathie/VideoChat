@@ -2,20 +2,19 @@ package ir.jin724.videochat
 
 import android.app.Application
 import android.content.Context
+import android.widget.Toast
 import androidx.multidex.MultiDex
 import com.google.gson.Gson
 import io.socket.client.IO
 import io.socket.client.Socket
 import ir.jin724.videochat.util.Constants
+import ir.jin724.videochat.util.DateConverter
 import ir.jin724.videochat.util.PrefsManager
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
-import java.security.Provider
-import java.security.Security
-
 
 class VideoChatApp : Application() {
 
@@ -40,6 +39,8 @@ class VideoChatApp : Application() {
             .build()
 
         val gson = Gson()
+
+        val dateConverter = DateConverter.getInstance()
     }
 
     val socket: Socket by lazy { IO.socket(SIGNALING_URI) }
@@ -50,6 +51,7 @@ class VideoChatApp : Application() {
         Timber.plant(Timber.DebugTree())
         prefsManager = PrefsManager(this)
 
+        Toast.makeText(this, "app created", Toast.LENGTH_SHORT).show()
         //ProviderUtil.allAlgorithm()
     }
 

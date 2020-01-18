@@ -3,12 +3,12 @@ package ir.jin724.videochat.webRTC
 import android.app.Application
 import android.content.Context
 import android.media.AudioManager
+import android.util.Log
 import ir.jin724.videochat.VideoChatApp
 import ir.jin724.videochat.VideoChatApp.Companion.gson
 import ir.jin724.videochat.data.userRepository.User
 import org.json.JSONObject
 import org.webrtc.*
-import org.webrtc.audio.JavaAudioDeviceModule
 import timber.log.Timber
 
 
@@ -54,6 +54,7 @@ class WebRTCClient(
     private val audioManager: AudioManager =
         context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+    private lateinit var surfaceTextureHelper: SurfaceTextureHelper
 
     init {
         audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
@@ -66,11 +67,17 @@ class WebRTCClient(
                 //signallingClient.send(p0)
                 // todo send ice candidate
                 //dataRepo.sendData(p0)
-                socket.emit(
-                    CANDIDATE,
-                    gson.toJson(p0, IceCandidate::class.java),
-                    config.bob.toJson()
-                )
+                try {
+                    socket.emit(
+                        CANDIDATE,
+                        gson.toJson(p0, IceCandidate::class.java),
+                        config.bob.toJson()
+                    )
+                } catch (e: Exception) {
+                    Timber.e("onIceCandidate socket error %s", e.message)
+                    e.printStackTrace()
+                }
+
                 addIceCandidate(p0)
             }
 
@@ -136,91 +143,102 @@ class WebRTCClient(
     private fun initSocket() {
         // this events comes from bob
         socket.on(OFFER) { args ->
+            Timber.e("****************** OFFER ****************")
+
             // یک درخواست از کاربری دیگر امده است
             //  باید session کاربر ذخیره شود و پاسخ او را بدهیم
             // البته ممکن است نخواهیم پاسخ دهیم که باید کنترل شدو
 
             // <--- args structure -->
             // { "sd" : {sessionDescription} , "bob" : {Bob} }
+            if (args.isNotEmpty()) {
+                val wrapperObject = args[0] as JSONObject
 
-            val wrapperObject = args[0] as JSONObject
-
-            if (!wrapperObject.has(SOCKET_PAYLOAD_SESSION_DESCRIPTION) || !wrapperObject.has(
-                    SOCKET_PAYLOAD_BOB
+                if (!wrapperObject.has(SOCKET_PAYLOAD_SESSION_DESCRIPTION) || !wrapperObject.has(
+                        SOCKET_PAYLOAD_BOB
+                    )
                 )
-            )
-                throw Exception("sd or bob is not available. please check offer emit at nodeJs server")
+                    throw Exception("sd or bob is not available. please check offer emit at nodeJs server")
 
-            val sdp = gson.fromJson<SessionDescription>(
-                wrapperObject.get(SOCKET_PAYLOAD_SESSION_DESCRIPTION).toString(),
-                SessionDescription::class.java
-            )
+                val sdp = gson.fromJson<SessionDescription>(
+                    wrapperObject.get(SOCKET_PAYLOAD_SESSION_DESCRIPTION).toString(),
+                    SessionDescription::class.java
+                )
 
-            val bob = gson.fromJson<User>(
-                wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
-                User::class.java
-            )
+                val bob = gson.fromJson<User>(
+                    wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
+                    User::class.java
+                )
 
-            Timber.e("sdp from bob :", sdp.toString())
-            Timber.e("bob user :", bob.toString())
+                Timber.e("sdp from bob :", sdp.toString())
+                Timber.e("bob user :", bob.toString())
 
 
-            // باید بررسی شود آیا کاربر می تواند در این لحظه پاسخگو باشد یا نه
-            setRemoteSessionDescription(sdp)
-            answer()
+                // باید بررسی شود آیا کاربر می تواند در این لحظه پاسخگو باشد یا نه
+                setRemoteSessionDescription(sdp)
+                answer()
+            }
+
 
         }.on(ANSWER) { args ->
+            Timber.e("****************** ANSWER ****************")
 
             // درخواست ما پاسخ داده شده است
             // پس طرف مقابل session خود را برای ما ارسال می کند تا اتصال برقرار شود
             // البته ممکن است پاسخ ندهد که باید کنترل شود
 
-            val wrapperObject = args[0] as JSONObject
+            if (args.isNotEmpty()) {
+                val wrapperObject = args[0] as JSONObject
 
-            if (!wrapperObject.has(SOCKET_PAYLOAD_SESSION_DESCRIPTION) || !wrapperObject.has(
-                    SOCKET_PAYLOAD_BOB
+                if (!wrapperObject.has(SOCKET_PAYLOAD_SESSION_DESCRIPTION) || !wrapperObject.has(
+                        SOCKET_PAYLOAD_BOB
+                    )
                 )
-            )
-                throw Exception("sd or bob is not available. please check answer emit at nodeJs server")
+                    throw Exception("sd or bob is not available. please check answer emit at nodeJs server")
 
-            val sdp = gson.fromJson<SessionDescription>(
-                wrapperObject.get(SOCKET_PAYLOAD_SESSION_DESCRIPTION).toString(),
-                SessionDescription::class.java
-            )
+                val sdp = gson.fromJson<SessionDescription>(
+                    wrapperObject.get(SOCKET_PAYLOAD_SESSION_DESCRIPTION).toString(),
+                    SessionDescription::class.java
+                )
 
-            val bob = gson.fromJson<User>(
-                wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
-                User::class.java
-            )
+                val bob = gson.fromJson<User>(
+                    wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
+                    User::class.java
+                )
 
-            Timber.e("sdp from bob :", sdp.toString())
-            Timber.e("bob user :", bob.toString())
+                Timber.e("sdp from bob :", sdp.toString())
+                Timber.e("bob user :", bob.toString())
 
-            setRemoteSessionDescription(sdp)
+                setRemoteSessionDescription(sdp)
+            }
             //answer()
         }.on(CANDIDATE) { args ->
-            val wrapperObject = args[0] as JSONObject
+            if (args.isNotEmpty()) {
+                Timber.e("****************** CANDIDATE ****************")
 
-            if (!wrapperObject.has(SOCKET_PAYLOAD_ICE_CANDIDATE) || !wrapperObject.has(
-                    SOCKET_PAYLOAD_BOB
+                val wrapperObject = args[0] as JSONObject
+
+                if (!wrapperObject.has(SOCKET_PAYLOAD_ICE_CANDIDATE) || !wrapperObject.has(
+                        SOCKET_PAYLOAD_BOB
+                    )
                 )
-            )
-                throw Exception("sd or bob is not available. please check candidate emit at nodeJs server")
+                    throw Exception("sd or bob is not available. please check candidate emit at nodeJs server")
 
-            val ice = gson.fromJson<IceCandidate>(
-                wrapperObject.get(SOCKET_PAYLOAD_ICE_CANDIDATE).toString(),
-                IceCandidate::class.java
-            )
+                val ice = gson.fromJson<IceCandidate>(
+                    wrapperObject.get(SOCKET_PAYLOAD_ICE_CANDIDATE).toString(),
+                    IceCandidate::class.java
+                )
 
-            val bob = gson.fromJson<User>(
-                wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
-                User::class.java
-            )
+                val bob = gson.fromJson<User>(
+                    wrapperObject.get(SOCKET_PAYLOAD_BOB).toString(),
+                    User::class.java
+                )
 
-            Timber.e("ice candidate", ice.toString())
-            Timber.e("bob user", bob.toString())
+                Timber.e("ice candidate", ice.toString())
+                Timber.e("bob user", bob.toString())
 
-            addIceCandidate(ice)
+                addIceCandidate(ice)
+            }
         }
 
 
@@ -272,12 +290,14 @@ class WebRTCClient(
         peerConnectionFactory.createAudioSource(audioConstraints)
     }
 
-    private val peerConnection by lazy { buildPeerConnection() }
+    private val peerConnection by lazy {
+        buildPeerConnection()
+    }
 
 
     fun start() {
         initSurfaceView(localViewRenderer)
-        initSurfaceView(remoteViewRenderer, true)
+        initSurfaceView(remoteViewRenderer)
         initPeerConnectionFactory(context)
         startLocalVideoCapture(localViewRenderer)
         initSocket()
@@ -346,7 +366,7 @@ class WebRTCClient(
     }
 
     private fun startLocalVideoCapture(localSurfaceRenderer: SurfaceViewRenderer) {
-        val surfaceTextureHelper =
+        surfaceTextureHelper =
             SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
 
         Timber.e("videoCapturer = $videoCapturer")
@@ -379,12 +399,12 @@ class WebRTCClient(
     }
 
 
-    private fun initSurfaceView(view: SurfaceViewRenderer, keepZOrderOverlay: Boolean = false) =
+    private fun initSurfaceView(view: SurfaceViewRenderer) =
         view.run {
             setMirror(true)
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
             setEnableHardwareScaler(true)
-            setZOrderMediaOverlay(keepZOrderOverlay)
+            setZOrderMediaOverlay(true)
             init(rootEglBase.eglBaseContext, null)
         }
 
@@ -434,7 +454,7 @@ class WebRTCClient(
 
                 override fun onCreateFailure(p0: String?) {
                     super.onCreateFailure(p0)
-                    Timber.e("onCreateFailure $p0")
+                    Timber.e("offer onCreateFailure $p0")
                 }
 
                 override fun onSetFailure(p0: String?) {
@@ -448,54 +468,107 @@ class WebRTCClient(
     fun answer() {
         with(peerConnection!!) {
             createAnswer(object : CustomSdbObserver() {
+
                 override fun onCreateSuccess(p0: SessionDescription?) {
                     super.onCreateSuccess(p0)
                     // todo send answer
                     // dataRepo.sendData(p0)
+                    Timber.e("****************** answer onCreateSuccess ****************")
+
                     socket.emit(
                         ANSWER,
                         gson.toJson(p0, SessionDescription::class.java),
                         config.bob.toJson()
                     )
+
                     setLocalSessionDescription(p0!!)
                 }
+
+                override fun onCreateFailure(p0: String?) {
+                    Timber.e("****************** answer onCreateFailure ****************")
+                    Timber.e("answer error $p0")
+                }
+
             }, createMediaConstraints())
         }
     }
 
     fun dispose() {
-        // close peer connection and release view renderer's
-        try {
-            // remove event listener from socket
-            socket.off(OFFER)
-            socket.off(ANSWER)
-            socket.off(CANDIDATE)
+
+        socket.off(OFFER)
+        socket.off(ANSWER)
+        socket.off(CANDIDATE)
 
 
-            // reset audio manager
-            audioManager.mode = AudioManager.MODE_NORMAL
-            audioManager.isSpeakerphoneOn = false
+        remoteViewRenderer.release()
+        localViewRenderer.release()
+        //remoteViewRenderer.clearImage()
+        //localViewRenderer.clearImage()
 
-            localAudioSource?.dispose()
-            localVideoSource?.dispose()
 
-            remoteViewRenderer.pauseVideo()
-            localViewRenderer.pauseVideo()
+        /*if (videoFileRenderer != null) {
+            videoFileRenderer.release();
+            videoFileRenderer = null;
+        }*/
 
-            localViewRenderer.clearImage()
-            remoteViewRenderer.clearImage()
+        /*if (fullscreenRenderer != null) {
+            fullscreenRenderer.release();
+            fullscreenRenderer = null;
+        }*/
 
-            localViewRenderer.release()
-            remoteViewRenderer.release()
+        peerConnection?.close()
 
-            peerConnection?.stopRtcEventLog()
+        /*if (dataChannel != null) {
+            dataChannel.dispose()
+            dataChannel = null
+        }*/
+
+        /*if (rtcEventLog != null) { // RtcEventLog should stop before the peer connection is disposed.
+            rtcEventLog.stop()
+            rtcEventLog = null
+        }*/
+
+
+        if (peerConnection != null) {
             peerConnection?.dispose()
-            peerConnection?.close()
-
-
-        } catch (e: Exception) {
-            Timber.e(e)
         }
+
+
+        if (localAudioSource != null) {
+            localAudioSource.dispose()
+        }
+
+
+        try {
+            videoCapturer.stopCapture()
+        } catch (e: InterruptedException) {
+            throw java.lang.RuntimeException(e)
+        }
+
+        videoCapturer.dispose()
+
+        if (localVideoSource != null) {
+            localVideoSource.dispose()
+        }
+
+        //surfaceTextureHelper.dispose()
+
+
+        /*if (saveRecordedAudioToFile != null) {
+            Log.d(TAG, "Closing audio file for recorded input audio.")
+            saveRecordedAudioToFile.stop()
+            saveRecordedAudioToFile = null
+        }
+        */
+
+
+        Log.d(TAG, "Closing peer connection factory.")
+        peerConnectionFactory.dispose()
+        rootEglBase.release()
+
+
+        PeerConnectionFactory.stopInternalTracingCapture()
+        PeerConnectionFactory.shutdownInternalTracer()
 
     }
 

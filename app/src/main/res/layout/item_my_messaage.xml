@@ -30,6 +30,7 @@
                     android:id="@+id/iv_replay"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
+                    android:visibility="invisible"
                     android:padding="7dp"
                     android:scaleX="-1"
                     app:srcCompat="@drawable/ic_reply_24dp" />

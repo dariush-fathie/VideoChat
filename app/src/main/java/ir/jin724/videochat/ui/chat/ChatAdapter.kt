@@ -10,6 +10,7 @@ import ir.jin724.videochat.databinding.ItemMyMessaageBinding
 import ir.jin724.videochat.ui.chat.holder.BobMessageHolder
 import ir.jin724.videochat.ui.chat.holder.MyMessageHolder
 import ir.jin724.videochat.util.inflater
+import timber.log.Timber
 
 class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -44,6 +45,8 @@ class ChatAdapter(private val user: User) : RecyclerView.Adapter<RecyclerView.Vi
 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        Timber.e("isFromMine ${user.userId} ${getItem(position).from} %b", isFromMine(position))
+
         if (isFromMine(position)) {
             holder as MyMessageHolder
             holder.bind(getItem(position))

@@ -15,11 +15,11 @@ data class ChatItem(
     val text: String,
 
     @Expose
-    @SerializedName("from")
+    @SerializedName("from_user_id")
     val from: Int,
 
     @Expose
-    @SerializedName("to")
+    @SerializedName("to_user_id")
     val to: Int,
 
 
@@ -37,4 +37,6 @@ data class ChatItem(
     @Expose
     @SerializedName("time")
     var time: String = ""
-)
+) {
+
+}

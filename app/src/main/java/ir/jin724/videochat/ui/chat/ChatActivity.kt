@@ -1,10 +1,10 @@
 package ir.jin724.videochat.ui.chat
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.media.RingtoneManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -110,6 +110,10 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     private fun getMessagesHistory() {
         viewModel.getChatHistory(me.userId, bob.userId).observe(this) {
             chatAdapter.addItems(it)
+
+            binding.rvChats.post {
+                binding.rvChats.scrollToPosition(chatAdapter.itemCount - 1)
+            }
         }
     }
 
@@ -249,16 +253,28 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
+    private val videoCallRequestCode = 1515
+
     private fun voiceCall() {
-        startActivity(Intent(this, WebRTCActivity::class.java).apply {
-            putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob , videoEnabled = false))
-        })
+        startActivityForResult(Intent(this, WebRTCActivity::class.java).apply {
+            putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob, videoEnabled = false))
+        }, videoCallRequestCode)
     }
 
     private fun videoCall() {
-        startActivity(Intent(this, WebRTCActivity::class.java).apply {
+        startActivityForResult(Intent(this, WebRTCActivity::class.java).apply {
             putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob))
-        })
+        }, videoCallRequestCode)
     }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK && requestCode == videoCallRequestCode) {
+            Toast.makeText(this, "Good luck", Toast.LENGTH_LONG).show()
+        }
+    }
+
 
 }

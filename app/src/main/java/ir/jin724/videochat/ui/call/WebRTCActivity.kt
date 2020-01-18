@@ -1,6 +1,7 @@
 package ir.jin724.videochat.ui.call
 
 import android.Manifest
+import android.app.Activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -58,6 +59,8 @@ class WebRTCActivity : AppCompatActivity() {
         binding.btnDispose.setOnClickListener {
             Timber.e("dispose click")
             webRtcClient.dispose()
+            setResult(Activity.RESULT_OK)
+            finish()
         }
 
         webRtcClient.start()
