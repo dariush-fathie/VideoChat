@@ -6,6 +6,7 @@ import ir.jin724.videochat.VideoChatApp
 import ir.jin724.videochat.data.chatRepository.ChatItem
 import ir.jin724.videochat.databinding.ItemMyMessaageBinding
 import ir.jin724.videochat.util.setImageResIf
+import timber.log.Timber
 
 
 class MyMessageHolder(private val binding: ItemMyMessaageBinding) :
@@ -13,6 +14,7 @@ class MyMessageHolder(private val binding: ItemMyMessaageBinding) :
 
     fun bind(chatItem: ChatItem) {
         binding.tvMessage.text = chatItem.text
+        Timber.e("time is %s", chatItem.time)
         binding.tvTime.text = VideoChatApp.dateConverter.convert2(chatItem.time)
 
         binding.ivDelivery.setImageResIf(

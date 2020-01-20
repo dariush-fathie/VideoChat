@@ -3,9 +3,12 @@ package ir.jin724.videochat.ui.chat
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.icu.text.DateFormat
+import android.icu.util.Calendar
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -25,6 +28,7 @@ import ir.jin724.videochat.databinding.ActivityChatBinding
 import ir.jin724.videochat.ui.call.WebRTCActivity
 import ir.jin724.videochat.util.ChatUtil
 import ir.jin724.videochat.util.Constants
+import ir.jin724.videochat.util.DateConverter
 import ir.jin724.videochat.util.GlideApp
 import ir.jin724.videochat.webRTC.WebRTCConfig
 import kotlinx.coroutines.Job
@@ -147,7 +151,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
             bob.userId,
             -1,
             false,
-            ""
+            DateConverter.getInstance().currentDate3()
         )
 
         chatAdapter.addItem(chatItem)

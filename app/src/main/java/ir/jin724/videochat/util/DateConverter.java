@@ -30,6 +30,9 @@ public class DateConverter {
         return new SimpleDateFormat("yyyyMMdd_HHMM", Locale.getDefault()).format(new Date());
     }
 
+    public String currentDate3() {
+        return new SimpleDateFormat("yyyy-MM-DD:HH:MM", Locale.getDefault()).format(new Date());
+    }
 
     private int[] getCurrentDate() {
         if (currentDate == null) {
@@ -95,6 +98,7 @@ public class DateConverter {
 
 
     public String convert2(String date) {
+        Timber.e("Converter %s %d" , date , date.length());
         int offset1 = 0;
         int offset2 = 0;
         int[] c = getCurrentDate();
