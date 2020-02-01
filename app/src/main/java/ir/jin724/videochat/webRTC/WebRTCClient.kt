@@ -10,16 +10,21 @@ import ir.jin724.videochat.data.userRepository.User
 import org.json.JSONObject
 import org.webrtc.*
 import timber.log.Timber
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 
 class WebRTCClient(
     private val context: Application,
     private val config: WebRTCConfig,
     private val localViewRenderer: SurfaceViewRenderer,
-    private val remoteViewRenderer: SurfaceViewRenderer
+    private val remoteViewRenderer: SurfaceViewRenderer,
+    private val bob: User
 ) {
 
     companion object {
+        private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+
         private const val LOCAL_VIDEO_TRACK_ID = "local_video_track"
         private const val LOCAL_AUDIO_TRACK_ID = "local_audio_track"
         private const val LOCAL_STREAM_ID = "local_stream_id"
@@ -47,6 +52,7 @@ class WebRTCClient(
         private val TAG = this::class.java.simpleName
     }
 
+
     private val socket = (context as VideoChatApp).socket
     private val rootEglBase: EglBase = EglBase.create()
     private val observer: PeerConnection.Observer
@@ -67,18 +73,23 @@ class WebRTCClient(
                 //signallingClient.send(p0)
                 // todo send ice candidate
                 //dataRepo.sendData(p0)
-                try {
-                    socket.emit(
-                        CANDIDATE,
-                        gson.toJson(p0, IceCandidate::class.java),
-                        config.bob.toJson()
-                    )
-                } catch (e: Exception) {
-                    Timber.e("onIceCandidate socket error %s", e.message)
-                    e.printStackTrace()
-                }
 
-                addIceCandidate(p0)
+                if (isMirror()) {
+                    remotePeerContext.addIceCandidate(p0)
+                } else {
+                    try {
+                        socket.emit(
+                            CANDIDATE,
+                            gson.toJson(p0, IceCandidate::class.java),
+                            config.bob.toJson()
+                        )
+                    } catch (e: Exception) {
+                        Timber.e("onIceCandidate socket error %s", e.message)
+                        e.printStackTrace()
+                    }
+
+                    addIceCandidate(p0)
+                }
             }
 
             override fun onAddStream(p0: MediaStream?) {
@@ -138,7 +149,6 @@ class WebRTCClient(
 
         }
     }
-
 
     private fun initSocket() {
         // this events comes from bob
@@ -265,6 +275,7 @@ class WebRTCClient(
 
     private val videoCapturer: VideoCapturer by lazy {
         createVideoCapturer(context)
+        //createVideoCapturer1(context)
     }
 
     private val localVideoSource by lazy {
@@ -294,6 +305,9 @@ class WebRTCClient(
         buildPeerConnection()
     }
 
+    private val remotePeerContext by lazy {
+        buildRemotePeerConnection()
+    }
 
     fun start() {
         initSurfaceView(localViewRenderer)
@@ -351,6 +365,89 @@ class WebRTCClient(
     }
 
 
+    private fun buildRemotePeerConnection(): PeerConnection {
+        val config = PeerConnection.RTCConfiguration(arrayListOf())
+        return peerConnectionFactory.createPeerConnection(
+            config,
+            object : PeerConnectionObserver() {
+                override fun onIceCandidate(p0: IceCandidate?) {
+                    super.onIceCandidate(p0)
+                    Timber.tag(TAG).e("onIceCandidate : ${p0?.toString()}")
+                    //signallingClient.send(p0)
+                    // todo send ice candidate
+                    //dataRepo.sendData(p0)
+                    /*try {
+                            socket.emit(
+                                CANDIDATE,
+                                gson.toJson(p0, IceCandidate::class.java),
+                                config.bob.toJson()
+                            )
+                        } catch (e: Exception) {
+                            Timber.e("onIceCandidate socket error %s", e.message)
+                            e.printStackTrace()
+                        }*/
+
+                    addIceCandidate(p0)
+                }
+
+                override fun onAddStream(p0: MediaStream?) {
+                    super.onAddStream(p0)
+                    Timber.tag(TAG).e("onAddStream : ${p0?.toString()}")
+                    //p0?.videoTracks?.get(0)?.addSink(remoteViewRenderer)
+
+                    p0?.let { stream ->
+                        stream.audioTracks?.let {
+                            if (it.isNotEmpty()) {
+                                it.forEach { audioTrack ->
+                                    // todo . what to do with audio tracks?
+                                }
+                            }
+                        }
+
+                        stream.videoTracks?.let {
+                            if (it.isNotEmpty()) {
+                                it.forEach { videoTrack ->
+                                    videoTrack?.addSink(remoteViewRenderer)
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                override fun onRemoveStream(p0: MediaStream?) {
+                    super.onRemoveStream(p0)
+
+                    p0?.let { stream ->
+                        stream.audioTracks?.let {
+                            if (it.isNotEmpty()) {
+                                it.forEach { audioTrack ->
+                                    // todo . what to do with audio tracks?
+                                }
+                            }
+                        }
+
+                        stream.videoTracks?.let {
+                            if (it.isNotEmpty()) {
+                                it.forEach { videoTrack ->
+                                    videoTrack?.removeSink(remoteViewRenderer)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {
+                    super.onIceCandidatesRemoved(p0)
+                    p0?.let {
+                        //remoteIceCandidate(it)
+                        remotePeerContext.removeIceCandidates(p0)
+                    }
+                    // todo send remote ice candidate
+                }
+            })!!
+    }
+
     private fun createVideoCapturer(context: Context): CameraVideoCapturer {
         //val fileVideoCapturer = FileVideoCapturer("");
         Timber.e("getVideoCapturer")
@@ -365,9 +462,25 @@ class WebRTCClient(
         }
     }
 
+
+    private fun createVideoCapturer1(context: Context): CameraVideoCapturer {
+        //val fileVideoCapturer = FileVideoCapturer("");
+        Timber.e("getVideoCapturer")
+        return Camera1Enumerator().run {
+            deviceNames.find {
+                isBackFacing(it)
+            }?.let {
+                createCapturer(it, null)
+            } ?: throw IllegalStateException()
+        }.apply {
+            Timber.e("getVideoCapturer = $this")
+        }
+    }
+
     private fun startLocalVideoCapture(localSurfaceRenderer: SurfaceViewRenderer) {
         surfaceTextureHelper =
             SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
+
 
         Timber.e("videoCapturer = $videoCapturer")
 
@@ -404,7 +517,7 @@ class WebRTCClient(
             setMirror(true)
             setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
             setEnableHardwareScaler(true)
-            setZOrderMediaOverlay(true)
+            //setZOrderMediaOverlay(true)
             init(rootEglBase.eglBaseContext, null)
         }
 
@@ -433,6 +546,23 @@ class WebRTCClient(
         }
     }
 
+    private fun changeVideoFormat(width: Int, height: Int, fps: Int) {
+        localVideoSource.adaptOutputFormat(width, height, fps)
+    }
+
+    private fun getRemoteVideoTrack(): MediaStreamTrack? {
+        peerConnection?.transceivers?.forEach {
+            val mediaTrackStream = it.receiver.track()
+            if (mediaTrackStream is VideoTrack) {
+                return mediaTrackStream
+            }
+        }
+        return null
+    }
+
+    private fun isMirror(): Boolean {
+        return bob.userId == 32
+    }
 
     fun call() {
         with(peerConnection!!) {
@@ -443,13 +573,31 @@ class WebRTCClient(
                     // todo send offer
                     // dataRepo.sendData(p0)
                     // درخواست اتصال ارسال می شود
-                    socket.emit(
-                        OFFER,
-                        gson.toJson(p0, SessionDescription::class.java),
-                        config.bob.toJson()
-                    )
 
                     setLocalSessionDescription(p0!!)
+
+                    if (!isMirror()) {
+                        socket.emit(
+                            OFFER,
+                            gson.toJson(p0, SessionDescription::class.java),
+                            config.bob.toJson()
+                        )
+                    } else {
+                        remotePeerContext.setRemoteDescription(CustomSdbObserver(), p0)
+                        remotePeerContext.createAnswer(object : CustomSdbObserver() {
+                            override
+                            fun onCreateSuccess(p0: SessionDescription?) {
+                                setRemoteDescription(
+                                    CustomSdbObserver(),
+                                    p0
+                                )
+                                remotePeerContext.setLocalDescription(
+                                    CustomSdbObserver(),
+                                    p0
+                                )
+                            }
+                        }, createMediaConstraints())
+                    }
                 }
 
                 override fun onCreateFailure(p0: String?) {
@@ -494,6 +642,13 @@ class WebRTCClient(
     }
 
     fun dispose() {
+        executor.execute {
+            disposeInternal()
+        }
+
+    }
+
+    private fun disposeInternal() {
 
         socket.off(OFFER)
         socket.off(ANSWER)
@@ -517,6 +672,7 @@ class WebRTCClient(
         }*/
 
         peerConnection?.close()
+        remotePeerContext.close()
 
         /*if (dataChannel != null) {
             dataChannel.dispose()
@@ -531,6 +687,7 @@ class WebRTCClient(
 
         if (peerConnection != null) {
             peerConnection?.dispose()
+            remotePeerContext.dispose()
         }
 
 
@@ -571,7 +728,6 @@ class WebRTCClient(
         PeerConnectionFactory.shutdownInternalTracer()
 
     }
-
     /*fun onRemoteSessionReceived(sessionDescription: SessionDescription) {
         peerConnection?.setRemoteDescription(object : CustomSdbObserver() {}, sessionDescription)
     }*/
@@ -582,6 +738,30 @@ class WebRTCClient(
 
     fun remoteIceCandidate(removedIce: Array<out IceCandidate>) {
         peerConnection?.removeIceCandidates(removedIce)
+    }
+
+
+    private fun switchCameraInternal() {
+        // todo check this later
+        val isError = false
+        if (videoCapturer is CameraVideoCapturer) {
+            if (!config.videoEnabled || isError) {
+                Timber.e(
+                    TAG,
+                    "Failed to switch camera. Video: " + config.videoEnabled + ". Error : " + isError
+                )
+                return  // No video is sent or only one camera is available or error happened.
+            }
+            Timber.e(TAG, "Switch camera")
+            val cameraVideoCapturer = videoCapturer as CameraVideoCapturer
+            cameraVideoCapturer.switchCamera(null)
+        } else {
+            Log.d(TAG, "Will not switch camera, video caputurer is not a camera")
+        }
+    }
+
+    fun switchCamera() {
+        executor.execute { switchCameraInternal() }
     }
 }
 

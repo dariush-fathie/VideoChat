@@ -9,13 +9,13 @@
         android:background="@color/transparent">
 
         <LinearLayout
-            android:baselineAligned="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:baselineAligned="false"
             android:orientation="horizontal"
-            android:paddingTop="8dp"
             android:paddingStart="8dp"
+            android:paddingTop="8dp"
             android:paddingEnd="8dp">
 
             <LinearLayout
@@ -30,9 +30,9 @@
                     android:id="@+id/iv_replay"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:visibility="invisible"
                     android:padding="7dp"
                     android:scaleX="-1"
+                    android:visibility="invisible"
                     app:srcCompat="@drawable/ic_reply_24dp" />
 
             </LinearLayout>
@@ -62,12 +62,15 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/tv_message"
+                            style="@style/TextAppearance.MaterialComponents.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minWidth="80dp"
+                            app:fontFamily="@font/vazir_light"
                             tools:lines="5"
                             tools:maxLength="200"
                             tools:text="@tools:sample/lorem/random" />
+
 
                     </LinearLayout>
 
@@ -87,7 +90,8 @@
                         style="@style/TextAppearance.MaterialComponents.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="15 min" />
+                        android:text="15 min"
+                        app:fontFamily="@font/vazir_light" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/iv_delivery"

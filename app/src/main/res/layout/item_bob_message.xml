@@ -45,6 +45,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minWidth="80dp"
+                            app:fontFamily="@font/vazir_light"
+                            style="@style/TextAppearance.MaterialComponents.Caption"
                             tools:lines="4"
                             tools:text="@tools:sample/lorem/random" />
 
@@ -67,6 +69,7 @@
                         android:id="@+id/tv_time"
                         style="@style/TextAppearance.MaterialComponents.Caption"
                         android:layout_width="wrap_content"
+                        app:fontFamily="@font/vazir_light"
                         android:layout_height="wrap_content"
                         android:text="15 min" />
 

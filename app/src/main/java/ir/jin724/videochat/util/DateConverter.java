@@ -461,7 +461,6 @@ public class DateConverter {
         }
     }
 
-
     public String convertSeconds(float second) {
         int rounded = Math.round(second) / 60;
         if (rounded == 0) {

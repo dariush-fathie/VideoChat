@@ -1,55 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <org.webrtc.SurfaceViewRenderer
             android:id="@+id/remote_view"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintWidth_percent="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <org.webrtc.SurfaceViewRenderer
-            android:id="@+id/local_view"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintStart_toEndOf="@+id/remote_view" />
-
-
-        <com.google.android.material.button.MaterialButton
-            android:text="start call"
-            android:id="@+id/btn_call"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="44dp"
+            android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_dispose"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:icon="@drawable/ic_phone_alt_24dp" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/local_view"
+            android:layout_width="100dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center" />
 
-        <com.google.android.material.button.MaterialButton
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_dispose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="end call"
-            android:layout_margin="20dp"
+            android:layout_margin="32dp"
             app:backgroundTint="#D32F2F"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:elevation="1dp"
+            app:fabCustomSize="72dp"
+            app:layout_constraintBottom_toTopOf="@id/ll_bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/btn_call"
-            app:icon="@drawable/ic_phone_slash_24dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_phone_slash_24dp"
+            app:tint="@color/white" />
+
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/ll_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            app:flexWrap="wrap"
+            app:justifyContent="space_evenly"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_voice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/white"
+                app:elevation="1dp"
+                app:srcCompat="@drawable/ic_microphone_24dp"
+                app:tint="@color/colorPrimaryDark" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/white"
+                app:elevation="1dp"
+                app:srcCompat="@drawable/ic_video_24dp"
+                app:tint="@color/colorPrimaryDark" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_switch_camera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/white"
+                app:elevation="1dp"
+                app:srcCompat="@drawable/ic_camera_switch"
+                app:tint="@color/colorPrimaryDark" />
+
+        </com.google.android.flexbox.FlexboxLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </layout>

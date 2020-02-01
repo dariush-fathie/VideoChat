@@ -268,6 +268,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     private fun videoCall() {
         startActivityForResult(Intent(this, WebRTCActivity::class.java).apply {
             putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob))
+            putExtra(Constants.BOB , bob)
         }, videoCallRequestCode)
     }
 
