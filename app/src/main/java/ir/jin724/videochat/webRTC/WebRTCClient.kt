@@ -180,8 +180,8 @@ class WebRTCClient(
                     User::class.java
                 )
 
-                Timber.e("sdp from bob :", sdp.toString())
-                Timber.e("bob user :", bob.toString())
+                Timber.e("sdp from bob : %s", sdp.toString())
+                Timber.e("bob user : %s", bob.toString())
 
 
                 // باید بررسی شود آیا کاربر می تواند در این لحظه پاسخگو باشد یا نه
@@ -216,8 +216,8 @@ class WebRTCClient(
                     User::class.java
                 )
 
-                Timber.e("sdp from bob :", sdp.toString())
-                Timber.e("bob user :", bob.toString())
+                Timber.e("sdp from bob : %s", sdp.toString())
+                Timber.e("bob user :%s", bob.toString())
 
                 setRemoteSessionDescription(sdp)
             }
@@ -244,8 +244,8 @@ class WebRTCClient(
                     User::class.java
                 )
 
-                Timber.e("ice candidate", ice.toString())
-                Timber.e("bob user", bob.toString())
+                Timber.e("ice candidate %s", ice.toString())
+                Timber.e("bob user %s", bob.toString())
 
                 addIceCandidate(ice)
             }
@@ -286,16 +286,16 @@ class WebRTCClient(
         val audioConstraints = MediaConstraints()
 
         audioConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair(AUDIO_ECHO_CANCELLATION_CONSTRAINT, "true")
+            MediaConstraints.KeyValuePair(AUDIO_ECHO_CANCELLATION_CONSTRAINT, "false")
         )
         audioConstraints.mandatory.add(
             MediaConstraints.KeyValuePair(AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT, "false")
         )
         audioConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair(AUDIO_HIGH_PASS_FILTER_CONSTRAINT, "true")
+            MediaConstraints.KeyValuePair(AUDIO_HIGH_PASS_FILTER_CONSTRAINT, "false")
         )
         audioConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair(AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "true")
+            MediaConstraints.KeyValuePair(AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "false")
         )
 
         peerConnectionFactory.createAudioSource(audioConstraints)
@@ -320,6 +320,7 @@ class WebRTCClient(
 
     private fun initPeerConnectionFactory(context: Application) {
         // init peerConnectionFactory options globally
+
         val options = PeerConnectionFactory.InitializationOptions.builder(context)
             .setEnableInternalTracer(true)
             .setFieldTrials("WebRTC-H264HighProfile/Enabled/")
@@ -505,6 +506,9 @@ class WebRTCClient(
 
         /*WebRtcAudioManager.setStereoOutput(true)
         WebRtcAudioManager.setStereoOutput(true)*/
+
+        //localVideoTrack.setEnabled(config.videoEnabled)
+        //localAudioTrack.setEnabled(config.audioEnabled)
 
         localStream.addTrack(localVideoTrack)
         localStream.addTrack(localAudioTrack)

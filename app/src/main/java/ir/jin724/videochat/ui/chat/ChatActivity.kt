@@ -26,10 +26,7 @@ import ir.jin724.videochat.data.chatRepository.ChatItem
 import ir.jin724.videochat.data.userRepository.User
 import ir.jin724.videochat.databinding.ActivityChatBinding
 import ir.jin724.videochat.ui.call.WebRTCActivity
-import ir.jin724.videochat.util.ChatUtil
-import ir.jin724.videochat.util.Constants
-import ir.jin724.videochat.util.DateConverter
-import ir.jin724.videochat.util.GlideApp
+import ir.jin724.videochat.util.*
 import ir.jin724.videochat.webRTC.WebRTCConfig
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -146,7 +143,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
         Toast.makeText(this, "sendMessage", Toast.LENGTH_SHORT).show()
         val chatItem = ChatItem(
             ChatUtil.generateTempChatItemId(me),
-            message,
+            message.encodeBase64(),
             me.userId,
             bob.userId,
             -1,
@@ -251,6 +248,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
             )
         } catch (e: Exception) {
             e.printStackTrace()
+
         }
 
         thePlayer.start()
@@ -262,6 +260,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     private fun voiceCall() {
         startActivityForResult(Intent(this, WebRTCActivity::class.java).apply {
             putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob, videoEnabled = false))
+            putExtra(Constants.BOB , bob)
         }, videoCallRequestCode)
     }
 

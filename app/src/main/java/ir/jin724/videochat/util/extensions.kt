@@ -1,6 +1,7 @@
 package ir.jin724.videochat.util
 
 import android.content.Context
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,4 +59,14 @@ fun JSONObject.toIce(): IceCandidate {
         getInt(WebRTCClient.SDP_M_LINE_INDEX),
         getString(WebRTCClient.SDP)
     )
+}
+
+
+fun String.decodeBase64(): String {
+    return String(Base64.decode(this, Base64.DEFAULT))
+}
+
+
+fun String.encodeBase64(): String {
+    return String(Base64.encode(this.toByteArray(), Base64.DEFAULT))
 }
