@@ -53,7 +53,10 @@ class VideoChatApp : Application() {
 
     }
 
-    val socket: Socket by lazy { IO.socket(SIGNALING_URI) }
+    val socket: Socket by lazy {
+        IO.socket(SIGNALING_URI)
+    }
+
     lateinit var prefsManager: PrefsManager
 
     override fun onCreate() {

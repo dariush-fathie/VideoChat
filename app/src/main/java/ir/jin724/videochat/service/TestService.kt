@@ -6,7 +6,6 @@ import android.os.IBinder
 
 class TestService : Service() {
 
-
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
