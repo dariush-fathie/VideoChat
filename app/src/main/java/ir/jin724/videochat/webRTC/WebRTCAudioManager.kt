@@ -108,28 +108,37 @@ class AppRTCAudioManager private constructor(context: Context) {
 
         bluetoothManager = AppRTCBluetoothManager.create(context, this)
         wiredHeadsetReceiver = WiredHeadsetReceiver()
+
         amState = AudioManagerState.UNINITIALIZED
+
         val sharedPreferences =
-            context.getSharedPreferences("webrtc_prefs", 0)
+            context.getSharedPreferences("webRTC_prefs", 0)
+
         useSpeakerphone = sharedPreferences.getString(
             context.getString(R.string.pref_speakerphone_key),
             context.getString(R.string.pref_speakerphone_default)
         )
+
         Log.d(TAG, "useSpeakerphone: $useSpeakerphone")
+
         defaultAudioDevice = if (useSpeakerphone == SPEAKERPHONE_FALSE) {
             AudioDevice.EARPIECE
         } else {
             AudioDevice.SPEAKER_PHONE
         }
+
         // Create and initialize the proximity sensor.
-// Tablet devices (e.g. Nexus 7) does not support proximity sensors.
-// Note that, the sensor will not be active until start() has been called.
+        // Tablet devices (e.g. Nexus 7) does not support proximity sensors.
+        // Note that, the sensor will not be active until start() has been called.
+
         proximitySensor =
             AppRTCProximitySensor.create(context) { onProximitySensorChangedState() }
+
         Log.d(
             TAG,
             "defaultAudioDevice: $defaultAudioDevice"
         )
+
         AppRTCUtils.logDeviceInfo(TAG)
     }
 
@@ -146,10 +155,12 @@ class AppRTCAudioManager private constructor(context: Context) {
         if (audioDevices.size == 2 && audioDevices.contains(AudioDevice.EARPIECE)
             && audioDevices.contains(AudioDevice.SPEAKER_PHONE)
         ) {
-            if (proximitySensor!!.sensorReportsNearState()) { // Sensor reports that a "handset is being held up to a person's ear",
+            if (proximitySensor!!.sensorReportsNearState()) {
+                // Sensor reports that a "handset is being held up to a person's ear",
                 // or "something is covering the light sensor".
                 setAudioDeviceInternal(AudioDevice.EARPIECE)
-            } else { // Sensor reports that a "handset is removed from a person's ear", or
+            } else {
+                // Sensor reports that a "handset is removed from a person's ear", or
                 // "the light sensor is no longer covered".
                 setAudioDeviceInternal(AudioDevice.SPEAKER_PHONE)
             }
@@ -163,7 +174,6 @@ class AppRTCAudioManager private constructor(context: Context) {
             context: Context,
             intent: Intent
         ) {
-
             val state =
                 intent.getIntExtra("state", Companion.STATE_UNPLUGGED)
 
@@ -182,6 +192,7 @@ class AppRTCAudioManager private constructor(context: Context) {
                         + ", n=" + name?.toString() + ", sb="
                         + isInitialStickyBroadcast
             )
+
 
             hasWiredHeadset = state == STATE_PLUGGED
             updateAudioDeviceState()

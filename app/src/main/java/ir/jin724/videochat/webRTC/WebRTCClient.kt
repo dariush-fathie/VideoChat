@@ -57,14 +57,18 @@ class WebRTCClient(
     private val rootEglBase: EglBase = EglBase.create()
     private val observer: PeerConnection.Observer
 
-    private val audioManager: AudioManager =
+    private var audioManager: AudioManager =
         context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     private lateinit var surfaceTextureHelper: SurfaceTextureHelper
 
     init {
-        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-        audioManager.isSpeakerphoneOn = true
+        //audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        //audioManager.isSpeakerphoneOn = true
+
+        // Create and audio manager that will take care of audio routing,
+        // audio modes, audio device enumeration etc.
+
 
         observer = object : PeerConnectionObserver() {
             override fun onIceCandidate(p0: IceCandidate?) {
@@ -315,6 +319,16 @@ class WebRTCClient(
         initPeerConnectionFactory(context)
         startLocalVideoCapture(localViewRenderer)
         initSocket()
+
+        val audioManager = AppRTCAudioManager.create(context)
+        audioManager.start(object : AppRTCAudioManager.AudioManagerEvents {
+            override fun onAudioDeviceChanged(
+                selectedAudioDevice: AppRTCAudioManager.AudioDevice?,
+                availableAudioDevices: Set<AppRTCAudioManager.AudioDevice>?
+            ) {
+
+            }
+        })
     }
 
 
@@ -364,7 +378,6 @@ class WebRTCClient(
             observer
         )
     }
-
 
     private fun buildRemotePeerConnection(): PeerConnection {
         val config = PeerConnection.RTCConfiguration(arrayListOf())
@@ -463,7 +476,6 @@ class WebRTCClient(
         }
     }
 
-
     private fun createVideoCapturer1(context: Context): CameraVideoCapturer {
         //val fileVideoCapturer = FileVideoCapturer("");
         Timber.e("getVideoCapturer")
@@ -514,7 +526,6 @@ class WebRTCClient(
         localStream.addTrack(localAudioTrack)
         peerConnection?.addStream(localStream)
     }
-
 
     private fun initSurfaceView(view: SurfaceViewRenderer) =
         view.run {
@@ -657,7 +668,6 @@ class WebRTCClient(
         socket.off(OFFER)
         socket.off(ANSWER)
         socket.off(CANDIDATE)
-
 
         remoteViewRenderer.release()
         localViewRenderer.release()
