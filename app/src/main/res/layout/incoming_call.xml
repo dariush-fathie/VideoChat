@@ -54,42 +54,47 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:background="@color/colorPrimaryDark"
-            android:src="@drawable/dariush_avatar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/calling" />
 
-        <com.google.android.flexbox.FlexboxLayout
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:flexWrap="wrap"
-            app:justifyContent="space_evenly"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/calling"
             app:layout_constraintVertical_bias="0.8">
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:id="@+id/fab_decline"
+                android:layout_marginTop="36dp"
                 android:layout_height="wrap_content"
                 app:backgroundTint="@color/white"
                 app:srcCompat="@drawable/ic_phone_slash_24dp"
+                android:layout_marginEnd="16dp"
                 app:tint="@color/red" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
+            <ir.jin724.videochat.view.WebRtcAnswerDeclineButton
+                android:id="@+id/answer_decline"
+                app:layout_constraintTop_toBottomOf="@+id/calling"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@color/green"
-                app:fabCustomSize="72dp"
-                app:srcCompat="@drawable/ic_phone_alt_24dp"
-                app:tint="@color/white" />
+                android:layout_height="wrap_content"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:id="@+id/fab_quick_message"
+                android:layout_marginTop="36dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 app:backgroundTint="@color/white"
                 app:srcCompat="@drawable/ic_comment_alt_lines" />
 
-        </com.google.android.flexbox.FlexboxLayout>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

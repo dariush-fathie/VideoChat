@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/merge"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:clipToPadding="false"
+        android:padding="16dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabCustomSize="72dp"
+            app:backgroundTint="@color/green"
+            app:srcCompat="@drawable/ic_phone_alt_24dp"
+            app:tint="@color/white" />
+
+        <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/reject"
+            android:background="@drawable/circle_tintable"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="64dp"
+            app:srcCompat="@drawable/ic_phone_slash_24dp" />-->
+
+    </LinearLayout>
+
+</merge>

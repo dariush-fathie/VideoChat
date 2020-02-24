@@ -57,7 +57,6 @@ class AppRTCAudioManager private constructor(context: Context) {
         private const val HAS_MIC = 1
     }
 
-
     private val appRtcContext: Context
     private val audioManager: AudioManager?
     private var audioManagerEvents: AudioManagerEvents? = null

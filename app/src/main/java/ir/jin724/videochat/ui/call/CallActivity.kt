@@ -88,6 +88,8 @@ class CallActivity : AppCompatActivity(), View.OnClickListener, WebRTCEvent {
             )
         }
 
+
+
         binding.btnSwitchCamera.setOnClickListener(this)
         binding.btnVideo.setOnClickListener(this)
         binding.btnVoice.setOnClickListener(this)
