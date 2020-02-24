@@ -3,12 +3,9 @@ package ir.jin724.videochat.ui.chat
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.icu.text.DateFormat
-import android.icu.util.Calendar
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.text.format.DateUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
@@ -25,7 +23,7 @@ import ir.jin724.videochat.VideoChatApp
 import ir.jin724.videochat.data.chatRepository.ChatItem
 import ir.jin724.videochat.data.userRepository.User
 import ir.jin724.videochat.databinding.ActivityChatBinding
-import ir.jin724.videochat.ui.call.WebRTCActivity
+import ir.jin724.videochat.ui.call.CallActivity
 import ir.jin724.videochat.util.*
 import ir.jin724.videochat.webRTC.WebRTCConfig
 import kotlinx.coroutines.Job
@@ -50,7 +48,7 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var bob: User
 
     private val viewModel: ChatViewModel by lazy {
-        ViewModelProviders.of(this).get(ChatViewModel::class.java)
+        ViewModelProvider(this).get(ChatViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -258,14 +256,14 @@ class ChatActivity : AppCompatActivity(), View.OnClickListener {
     private val videoCallRequestCode = 1515
 
     private fun voiceCall() {
-        startActivityForResult(Intent(this, WebRTCActivity::class.java).apply {
+        startActivityForResult(Intent(this, CallActivity::class.java).apply {
             putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob, videoEnabled = false))
             putExtra(Constants.BOB , bob)
         }, videoCallRequestCode)
     }
 
     private fun videoCall() {
-        startActivityForResult(Intent(this, WebRTCActivity::class.java).apply {
+        startActivityForResult(Intent(this, CallActivity::class.java).apply {
             putExtra(Constants.WEB_RTC_CONFIG, WebRTCConfig(bob))
             putExtra(Constants.BOB , bob)
         }, videoCallRequestCode)

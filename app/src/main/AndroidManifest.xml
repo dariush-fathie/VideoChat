@@ -41,7 +41,7 @@
             android:name=".ui.signup.SignUpActivity"
             android:label="@string/title_activity_sigup"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.call.WebRTCActivity" />
+        <activity android:name=".ui.call.CallActivity" />
 
 
         <service

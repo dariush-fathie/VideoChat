@@ -12,24 +12,41 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.kotlinpermissions.KotlinPermissions
 import ir.jin724.videochat.R
+import ir.jin724.videochat.VideoChatApp
 import ir.jin724.videochat.data.userRepository.User
 import ir.jin724.videochat.databinding.ActivityWebrtcBinding
 import ir.jin724.videochat.util.Constants
 import ir.jin724.videochat.util.CustomAnimationListener
 import ir.jin724.videochat.webRTC.WebRTCClient
 import ir.jin724.videochat.webRTC.WebRTCConfig
+import ir.jin724.videochat.webRTC.WebRTCEvent
+import ir.jin724.videochat.webRTC.WebRTCSocketHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.webrtc.IceCandidate
+import org.webrtc.SessionDescription
 import timber.log.Timber
 
 
-class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
+class CallActivity : AppCompatActivity(), View.OnClickListener, WebRTCEvent {
 
     private lateinit var webRtcClient: WebRTCClient
     private lateinit var config: WebRTCConfig
 
+    private val socketHandler by lazy {
+        // todo inject gson later
+        WebRTCSocketHandler(socket, this, VideoChatApp.gson)
+    }
+
+    private val socket by lazy {
+        (application as VideoChatApp).socket
+    }
+
+
+    private lateinit var hideJob: Job
+    private var visibility = true
 
     private val binding: ActivityWebrtcBinding by lazy {
         DataBindingUtil.setContentView<ActivityWebrtcBinding>(this, R.layout.activity_webrtc)
@@ -44,7 +61,6 @@ class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
 
         config = intent.getParcelableExtra(Constants.WEB_RTC_CONFIG)
             ?: throw Exception("webRTCConfig must not be null")
-
 
         KotlinPermissions.with(this)
             .permissions(
@@ -86,6 +102,7 @@ class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
     private fun initWebRTCClient() {
         webRtcClient = WebRTCClient(
             this.application,
+            this,
             config,
             binding.localView,
             binding.remoteView,
@@ -94,8 +111,6 @@ class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
 
         binding.localView.setZOrderMediaOverlay(true)
         binding.localView.setZOrderOnTop(true)
-        //binding.remoteView.setZOrderMediaOverlay(true)
-        //binding.remoteView.setZOrderOnTop(true)
 
         binding.btnDispose.setOnClickListener {
             Timber.e("dispose click")
@@ -105,7 +120,7 @@ class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         webRtcClient.start()
-        webRtcClient.call()
+        webRtcClient.offer()
     }
 
     override fun onClick(v: View?) {
@@ -125,13 +140,9 @@ class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private lateinit var hideJob: Job
-    private var visibility = true
-
-
     private fun controlButtonsVisibility() {
         lifecycleScope.launch {
-            if (this@WebRTCActivity::hideJob.isInitialized) {
+            if (this@CallActivity::hideJob.isInitialized) {
                 hideJob.cancel()
             }
             Timber.e("root clicked")
@@ -153,7 +164,6 @@ class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-
     private fun hideButtons() {
         binding.btnDispose.animate().setDuration(300).alpha(0f)
             .translationY(50f)
@@ -162,7 +172,10 @@ class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
                     binding.btnDispose.visibility = View.GONE
                 }
             })
-        binding.llBottom.animate().setDuration(300).alpha(0f)
+
+        binding.llBottom.animate()
+            .setDuration(300)
+            .alpha(0f)
             .translationY(50f)
             .setListener(object : CustomAnimationListener() {
                 override fun onAnimationEnd(animation: Animator?) {
@@ -192,4 +205,51 @@ class WebRTCActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
+    override fun onICECandidate(ice: IceCandidate) {
+        // todo add ice to peerConnection
+        webRtcClient.addIceCandidate(ice)
+    }
+
+    override fun onOffer(sdp: SessionDescription, bob: User) {
+        // todo offer received . do you want to answer?
+        // باید بررسی شود آیا کاربر می تواند در این لحظه پاسخگو باشد یا نه
+        webRtcClient.onOffer(sdp, bob)
+    }
+
+    override fun onAnswer(sdp: SessionDescription, bob: User) {
+        // todo now you can establish connection . just save remote user sdp to peer connection
+        webRtcClient.onAnswer(sdp, bob)
+    }
+
+    override fun sendAnswer(sdp: SessionDescription, bob: User) {
+        // todo save sdp as local session in sdp and emit it to web socket  .
+        socketHandler.sendAnswer(sdp, bob)
+    }
+
+    override fun sendOffer(sdp: SessionDescription, bob: User) {
+        // todo create offer and send to wss
+        socketHandler.sendOffer(sdp, bob)
+    }
+
+    override fun sendICE(ice: IceCandidate, bob: User) {
+        socketHandler.sendIce(ice, bob)
+    }
+
+    override fun onICERemoved(ice: Array<IceCandidate>) {
+        webRtcClient.onICERemoved(ice)
+    }
+
+    override fun sendICERemoved(ice: Array<out IceCandidate>?, bob: User) {
+        ice?.let {
+            socketHandler.sendICERemoved(ice, bob)
+        }
+    }
+
+    override fun onUnavailable() {
+        // what to do ?
+    }
+
+    override fun onDisconnect() {
+        socketHandler.dispose()
+    }
 }

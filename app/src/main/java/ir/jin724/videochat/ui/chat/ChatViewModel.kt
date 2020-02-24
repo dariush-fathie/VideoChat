@@ -52,6 +52,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             newMessageTrigger.postValue(chatItem)
         }
 
+        socket.on(Constants.NEW_MESSAGE) {
+            Timber.e("new message(double subscribe) ...")
+        }
+
+
         socket.on(Constants.IS_WRITING) {
             // todo get writer for public chat group
             isWritingTrigger.postValue(true)

@@ -20,8 +20,11 @@ import timber.log.Timber
 
 class VideoChatApp : Application() {
 
+    val tag = VideoChatApp::class.java.simpleName
+
     companion object {
         private const val SIGNALING_URI = Constants.BASE_URL
+
 
         private val loggingInterceptor =
             HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message ->
@@ -50,7 +53,6 @@ class VideoChatApp : Application() {
                 // todo check this later
                 field = value
             }
-
     }
 
     val socket: Socket by lazy {
@@ -67,7 +69,7 @@ class VideoChatApp : Application() {
         Toast.makeText(this, "app created", Toast.LENGTH_SHORT).show()
         //ProviderUtil.allAlgorithm()
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(ApplicationLifecycleObserver())
+        ProcessLifecycleOwner.get().lifecycle.addObserver(ApplicationLifecycleObserver(this))
     }
 
     override fun attachBaseContext(base: Context) {
@@ -76,19 +78,30 @@ class VideoChatApp : Application() {
     }
 
 
-    open class ApplicationLifecycleObserver : LifecycleObserver {
+    open class ApplicationLifecycleObserver(private val context: Context) : LifecycleObserver {
+        private val tag = "APPLICATION_LIFECYCLE"
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun onStop() {
             applicationStatus.value = ApplicationStatus.BACKGROUND
+            Timber.tag(tag).e("ON_STOP")
+            Toast.makeText(context ,"APPLICATION STOP" , Toast.LENGTH_SHORT).show()
         }
 
 
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun onStart() {
             applicationStatus.value = ApplicationStatus.FOREGROUND
+            Timber.tag(tag).e("ON_START")
+            Toast.makeText(context ,"APPLICATION START" , Toast.LENGTH_SHORT).show()
         }
 
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        fun onDestroy() {
+            applicationStatus.value = ApplicationStatus.FOREGROUND
+            Timber.tag(tag).e("ON_DESTROY")
+            Toast.makeText(context ,"APPLICATION DESTROY" , Toast.LENGTH_SHORT).show()
+        }
 
         enum class ApplicationStatus {
             BACKGROUND, FOREGROUND
