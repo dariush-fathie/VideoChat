@@ -17,6 +17,8 @@
     <color name="on_surface">#ECE8F1</color>
     <color name="hint_on_on_surface">#B3A1CA</color>
     <color name="text_on_on_surface">#301353</color>
+    <color name="red">#ff0000</color>
+    <color name="green">#00C853</color>
 
 
 </resources>

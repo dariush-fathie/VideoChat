@@ -23,6 +23,21 @@
         <item name="titleTextColor">@color/white</item>
     </style>
 
+    <style name="FullScreenDialog" parent="Theme.MaterialComponents.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+
+        <!-- Set this to true if you want Full Screen without status bar -->
+        <item name="android:windowFullscreen">false</item>
+
+        <item name="android:windowIsFloating">false</item>
+
+        <!-- This is important! Don't forget to set window background -->
+        <item name="android:windowBackground">@color/colorPrimary</item>
+
+    </style>
+
     <style name="SubTitleTextAppearance" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="fontFamily">@font/fira_sans</item>
         <item name="android:textAllCaps">true</item>

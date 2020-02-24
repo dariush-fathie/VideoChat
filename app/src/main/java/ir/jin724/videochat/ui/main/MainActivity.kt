@@ -4,13 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import ir.jin724.videochat.R
 import ir.jin724.videochat.VideoChatApp
 import ir.jin724.videochat.data.userRepository.User
 import ir.jin724.videochat.databinding.ActivityMainBinding
+import ir.jin724.videochat.ui.call.CallDialog
 import ir.jin724.videochat.ui.signup.SignUpActivity
 import ir.jin724.videochat.util.PrefsManager
 
@@ -31,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainAdapter: MainAdapter
 
     private val viewModel: MainViewModel by lazy {
-        ViewModelProviders.of(this).get(MainViewModel::class.java)
+        ViewModelProvider(this).get(MainViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +45,9 @@ class MainActivity : AppCompatActivity() {
 
         setUpList()
         getAllOnlineUsers()
+
+        val dialog = CallDialog()
+        dialog.show(supportFragmentManager, "")
     }
 
     private fun getAllOnlineUsers() {

@@ -9,6 +9,7 @@ import ir.jin724.videochat.R
 import ir.jin724.videochat.VideoChatApp
 import ir.jin724.videochat.ui.call.CallActivity
 import ir.jin724.videochat.ui.main.MainActivity
+import ir.jin724.videochat.util.Constants
 import ir.jin724.videochat.util.decodeBase64
 import ir.zadak.zadaknotify.notification.ZadakNotification
 import ir.zadak.zadaknotify.pendingintent.ClickPendingIntentActivity
@@ -22,10 +23,46 @@ class FCMService : FirebaseMessagingService() {
 
     private val tag = this::class.java.simpleName
 
+    // todo : inject socket later
+
+    private val socket by lazy {
+        (application as VideoChatApp).socket
+    }
+
+
+    companion object {
+        const val EVENT = "event"
+        const val EVENT_HI = "hi"
+        const val PAYLOAD = "payload"
+
+        private val OFFER = "offer"
+        private val ANSWER = "answer"
+        private val CANDIDATE = "candidate"
+        private val CANDIDATE_REMOVED = "candidate_removed"
+        private val DISPOSE = "dispose"
+        private val UNAVAILABLE = "unavailable"
+    }
+
     override fun onMessageReceived(p0: RemoteMessage) {
         super.onMessageReceived(p0)
 
         val message = p0.data["message"].toString().decodeBase64()
+
+        when (p0.data[EVENT]) {
+            EVENT_HI -> {
+                sayHi()
+                // todo get extra information here
+                // like userId , requestId etc .
+            }
+            OFFER -> {
+                // todo : redirect offer to MainActivity
+                val payload = p0.data[PAYLOAD]
+                startActivity(Intent(this, MainActivity::class.java).apply {
+                    putExtra(PAYLOAD, payload)
+                    flags += Intent.FLAG_ACTIVITY_SINGLE_TOP
+                })
+            }
+        }
 
         ZadakNotification.with(this)
             .load()
@@ -64,6 +101,10 @@ class FCMService : FirebaseMessagingService() {
             .simple()
             .build()
 
+    }
+
+    private fun sayHi() {
+        socket.emit(Constants.I_AM_ONLINE)
     }
 
 
