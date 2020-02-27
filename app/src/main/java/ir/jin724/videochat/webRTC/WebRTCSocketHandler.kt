@@ -181,4 +181,10 @@ class WebRTCSocketHandler(private val socket: Socket, event: WebRTCEvent, privat
         // todo what to do else ?
     }
 
+
+    private inner class SSLContext {
+
+
+    }
+
 }

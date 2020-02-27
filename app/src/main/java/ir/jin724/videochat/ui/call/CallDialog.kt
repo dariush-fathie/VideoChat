@@ -4,13 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import androidx.core.view.marginTop
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.DialogFragment
 import ir.jin724.videochat.R
 import ir.jin724.videochat.databinding.IncomingCallBinding
-import ir.jin724.videochat.util.AccessibilityUtil
+import ir.jin724.videochat.util.ServiceUtil
 import ir.jin724.videochat.util.ViewUtil
 import ir.jin724.videochat.view.WebRtcAnswerDeclineButton
 import timber.log.Timber
@@ -31,7 +28,7 @@ class CallDialog : DialogFragment(), WebRtcAnswerDeclineButton.AnswerDeclineList
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = IncomingCallBinding.inflate(inflater,container,false)
+        binding = IncomingCallBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -55,20 +52,23 @@ class CallDialog : DialogFragment(), WebRtcAnswerDeclineButton.AnswerDeclineList
     }
 
 
-    private fun updateFabMargin(){
-        if (AccessibilityUtil.areAnimationsDisabled(requireContext())){
-            val px16 = ViewUtil.dpToPx(requireContext(),16)
+    private fun updateFabMargin() {
+        val service = ServiceUtil.getAccessibilityManager(requireContext());
 
-            val lp = binding.fabDecline.layoutParams as LinearLayout.LayoutParams
+        if (service.isTouchExplorationEnabled) {
+            val px16 = ViewUtil.dpToPx(requireContext(), 16)
+            Timber.e("touchExplorationEnabled ${service.isTouchExplorationEnabled}")
+
+            /*val lp = binding.fabQuickMessage.layoutParams as LinearLayout.LayoutParams
             lp.topMargin = px16
-            binding.fabDecline.layoutParams = lp
+            binding.fabQuickMessage.layoutParams = lp
 
-            val lp2 = binding.fabQuickMessage.layoutParams as LinearLayout.LayoutParams
+            val lp2  = binding.fabDecline.layoutParams as LinearLayout.LayoutParams
             lp2.topMargin = px16
-            binding.fabQuickMessage.layoutParams = lp2
+            binding.fabDecline.layoutParams = lp2*/
 
-            binding.fabQuickMessage.requestLayout()
-            binding.fabDecline.requestLayout()
+            ViewUtil.setTopMargin(binding.fabDecline, px16)
+            ViewUtil.setTopMargin(binding.fabQuickMessage, px16)
         }
     }
 

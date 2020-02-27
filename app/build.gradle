@@ -98,7 +98,7 @@ dependencies {
     def retrofit = '2.6.4'
     api "com.squareup.retrofit2:retrofit:$retrofit"
     api "com.squareup.retrofit2:converter-gson:$retrofit"
-    api "com.squareup.okhttp3:logging-interceptor:3.12.1"
+    api "com.squareup.okhttp3:logging-interceptor:3.14.7"
 
     implementation 'ru.superjob:kotlin-permissions:1.0.3'
 
@@ -109,10 +109,10 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.2.0'
     implementation 'com.github.mehrdadsafari:ZadakNotification:0.0.2'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    testImplementation 'org.mockito:mockito-core:1.10.19'
+    testImplementation 'org.mockito:mockito-core:3.3.0'
 
 }
 

@@ -11,37 +11,34 @@ import io.socket.client.Socket
 import ir.jin724.videochat.util.Constants
 import ir.jin724.videochat.util.DateConverter
 import ir.jin724.videochat.util.PrefsManager
+import ir.jin724.videochat.webRTC.CustomTrust
+import ir.jin724.videochat.webRTC.SocketFactory
+import ir.zadak.zadaknotify.notification.Custom
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.greenrobot.eventbus.EventBus
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
+import javax.net.ssl.X509TrustManager
 
 class VideoChatApp : Application() {
 
     val tag = VideoChatApp::class.java.simpleName
 
     companion object {
-        private const val SIGNALING_URI = Constants.BASE_URL
+        private lateinit var ctx:Context
 
+        val retrofit : Retrofit by lazy {
+            val customTrust = CustomTrust(ctx)
+            val retrofit = Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(customTrust.client)
+                .build()
+            retrofit
+        }
 
-        private val loggingInterceptor =
-            HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message ->
-                if (BuildConfig.DEBUG) {
-                    Timber.tag("OkHttp").e(message)
-                }
-            }).setLevel(HttpLoggingInterceptor.Level.BODY)
-
-        private val client = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
 
         val gson = Gson()
 
@@ -56,13 +53,15 @@ class VideoChatApp : Application() {
     }
 
     val socket: Socket by lazy {
-        IO.socket(SIGNALING_URI)
+        SocketFactory.getSecureSocket(this,CustomTrust(this)) ?: throw Exception("null socket")
     }
 
     lateinit var prefsManager: PrefsManager
 
     override fun onCreate() {
         super.onCreate()
+        ctx = this
+
         Timber.plant(Timber.DebugTree())
         prefsManager = PrefsManager(this)
 

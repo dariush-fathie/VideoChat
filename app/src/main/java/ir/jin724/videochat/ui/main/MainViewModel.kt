@@ -61,7 +61,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Timber.e(Constants.NEW_MESSAGE)
             }
 
-            socket.connect()
             socket.emit(Constants.I_AM_ONLINE, user.userId)
         }
 

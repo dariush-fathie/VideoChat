@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kotlinpermissions.KotlinPermissions
 import ir.jin724.videochat.R
 import ir.jin724.videochat.VideoChatApp
@@ -21,6 +23,7 @@ import ir.jin724.videochat.webRTC.WebRTCClient
 import ir.jin724.videochat.webRTC.WebRTCConfig
 import ir.jin724.videochat.webRTC.WebRTCEvent
 import ir.jin724.videochat.webRTC.WebRTCSocketHandler
+import kotlinx.android.synthetic.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -34,6 +37,9 @@ class CallActivity : AppCompatActivity(), View.OnClickListener, WebRTCEvent {
 
     private lateinit var webRtcClient: WebRTCClient
     private lateinit var config: WebRTCConfig
+
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private val socketHandler by lazy {
         // todo inject gson later
@@ -61,6 +67,9 @@ class CallActivity : AppCompatActivity(), View.OnClickListener, WebRTCEvent {
 
         config = intent.getParcelableExtra(Constants.WEB_RTC_CONFIG)
             ?: throw Exception("webRTCConfig must not be null")
+
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.root)
+        bottomSheetBehavior.peekHeight = 400
 
         KotlinPermissions.with(this)
             .permissions(
@@ -254,4 +263,12 @@ class CallActivity : AppCompatActivity(), View.OnClickListener, WebRTCEvent {
     override fun onDisconnect() {
         socketHandler.dispose()
     }
+
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        webRtcClient.dispose()
+        socketHandler.dispose()
+    }
+
 }

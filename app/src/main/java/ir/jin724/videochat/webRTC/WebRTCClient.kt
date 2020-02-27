@@ -394,6 +394,7 @@ class WebRTCClient(
 
         localStream.addTrack(localVideoTrack)
         localStream.addTrack(localAudioTrack)
+
         peerConnection?.addStream(localStream)
     }
 
