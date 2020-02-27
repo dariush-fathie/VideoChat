@@ -6,30 +6,25 @@ import android.widget.Toast
 import androidx.lifecycle.*
 import androidx.multidex.MultiDex
 import com.google.gson.Gson
-import io.socket.client.IO
 import io.socket.client.Socket
 import ir.jin724.videochat.util.Constants
 import ir.jin724.videochat.util.DateConverter
 import ir.jin724.videochat.util.PrefsManager
 import ir.jin724.videochat.webRTC.CustomTrust
 import ir.jin724.videochat.webRTC.SocketFactory
-import ir.zadak.zadaknotify.notification.Custom
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import org.greenrobot.eventbus.EventBus
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
-import javax.net.ssl.X509TrustManager
 
 class VideoChatApp : Application() {
 
     val tag = VideoChatApp::class.java.simpleName
 
     companion object {
-        private lateinit var ctx:Context
+        private lateinit var ctx: Context
 
-        val retrofit : Retrofit by lazy {
+        val retrofit: Retrofit by lazy {
             val customTrust = CustomTrust(ctx)
             val retrofit = Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL)
@@ -53,7 +48,7 @@ class VideoChatApp : Application() {
     }
 
     val socket: Socket by lazy {
-        SocketFactory.getSecureSocket(this,CustomTrust(this)) ?: throw Exception("null socket")
+        SocketFactory.getSecureSocket(CustomTrust(this)) ?: throw Exception("null socket")
     }
 
     lateinit var prefsManager: PrefsManager
@@ -84,7 +79,7 @@ class VideoChatApp : Application() {
         fun onStop() {
             applicationStatus.value = ApplicationStatus.BACKGROUND
             Timber.tag(tag).e("ON_STOP")
-            Toast.makeText(context ,"APPLICATION STOP" , Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "APPLICATION STOP", Toast.LENGTH_SHORT).show()
         }
 
 
@@ -92,14 +87,14 @@ class VideoChatApp : Application() {
         fun onStart() {
             applicationStatus.value = ApplicationStatus.FOREGROUND
             Timber.tag(tag).e("ON_START")
-            Toast.makeText(context ,"APPLICATION START" , Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "APPLICATION START", Toast.LENGTH_SHORT).show()
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         fun onDestroy() {
             applicationStatus.value = ApplicationStatus.FOREGROUND
             Timber.tag(tag).e("ON_DESTROY")
-            Toast.makeText(context ,"APPLICATION DESTROY" , Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "APPLICATION DESTROY", Toast.LENGTH_SHORT).show()
         }
 
         enum class ApplicationStatus {
